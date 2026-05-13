@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { Input } from "../../components/common/Input";
-import { Button } from "../../components/common/Button";
+import { Input } from "../../components/common/input";
+import { Button } from "../../components/common/button";
 import { Leaf, Mail, Lock } from "lucide-react";
 import { toast } from "sonner";
 
@@ -98,11 +98,14 @@ return (
     <li>• Commercial: commercial@aviculture.fr</li>
 </ul>
 <p className="text-xs text-blue-600 mt-2 italic">
+    <p className="text-xs font-medium text-blue-900 mb-2">
+    Mot de passe pour tous les comptes :
+    </p>
     <ul className="text-xs text-blue-800 space-y-1">
-    <li>commercial123</li>
-    <li>vet123</li>
-    <li>agent123</li>
     <li>admin123</li>
+    <li>agent123</li>
+    <li>vet123</li>
+    <li>commercial123</li>
     </ul>
 
 </p>

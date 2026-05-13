@@ -138,7 +138,7 @@ export function Sidebar() {
           </div>
           <div>
             <h1 className="font-semibold text-gray-900">PoultryConnect</h1>
-            <p className="text-xs text-gray-500">IoT Avicole</p>
+            <p className="text-xs text-gray-500">Controlez a distance</p>
           </div>
         </div>
 
