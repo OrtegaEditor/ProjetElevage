@@ -4,12 +4,17 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { LandingPage } from "./pages/LandingPage";
 import { LoginPage } from "./pages/Auth/LoginPage";
 import { AppLayout } from "./components/layout/AppLayout";
+import { AgentDashboard } from "./pages/Dashboard/AgentDashboard";
+
 import React from "react";
 
 function DashboardRouter() {
   const { user } = useAuth();
   if (!user) return null;
-  return <div>Dashboard - {user.role}</div>;
+  switch (user.role) {
+    case "agent": return <AgentDashboard />;
+    default: return <div>Dashboard - {user.role}</div>;
+  }
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
