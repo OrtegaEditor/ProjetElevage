@@ -4,8 +4,7 @@ export type PoultryType = "broiler" | "layer" | "turkey" | "duck" | "goose";
 
 export interface User {
     id: string;
-    fname: string;
-    lname: string;
+    name: string;
     password : string;
     email: string;
     role: UserRole;
@@ -18,9 +17,9 @@ export interface User {
 export interface Farm {  //Ferme d'elevages
     id: string;
     name: string;
-    localisation: string;
+    address: string;
     type: PoultryType;
-    description :String;
+    description: string;
     createdAt: string;
     }
 
@@ -57,16 +56,17 @@ export interface Alert {
     message: string;
     idPoultryHouse: string;
     poultryHouseId?: string;
+    farmId?: string;
     resolved: boolean;
     createdAt: string;
     resolvedAt?: string;
 }
 export interface Band{
-    id : String;
-    farmId:string;
-    especeId : string;
-    quantity :number;
-    createdDate: String;
+    id: string;
+    farmId: string;
+    especeId: string;
+    quantity: number;
+    createdDate: string;
 }
 export interface Flock {  //Lots de volailles
     id: string;
@@ -96,7 +96,7 @@ export interface Treatment { //soins
     id: string;
     flockId: string;
     veterinarianId: string;
-    disease: string;
+    diseaseId: string;
     animalsCount : number
     medication: string;
     dosage: string;
@@ -109,7 +109,7 @@ export interface Vaccination {
     id: string;
     flockId: string;
     vaccine: string;
-    disease: string;
+    diseaseId: string;
     administrationDate: string;
     nextDueDate?: string;
     method: "drinking_water" | "injection" | "spray" | "eye_drop";

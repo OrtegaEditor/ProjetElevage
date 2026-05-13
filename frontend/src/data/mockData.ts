@@ -41,8 +41,7 @@ export const mockbands : Band[] =[
 export const mockUsers: User[] = [
     {
     id: "1",
-    fname: "FOSSO",
-    lname:"Marcelin",
+    name: "FOSSO Marcelin",
     password :"admin123",
     email: "admin@aviculture.fr",
     role: "admin",
@@ -52,8 +51,7 @@ export const mockUsers: User[] = [
     },
     {
     id: "2",
-    fname: "Tagne",
-    lname: "Pierre",
+    name: "Tagne Pierre",
     password :"agent123",
     email: "agent@aviculture.fr",
     role: "agent",
@@ -63,8 +61,7 @@ export const mockUsers: User[] = [
     },
     {
     id: "3",
-    fname: "Dr Pierre",
-    lname: "Dubois",
+    name: "Dr Kamdem Simo",
     password :"vet123",
     email: "vet@aviculture.fr",
     role: "veterinarian",
@@ -74,8 +71,7 @@ export const mockUsers: User[] = [
     },
 {
     id: "4",
-    fname: "Geh Sophie ",
-    lname : "Sophie",
+    name: "Geh Sophie ",
     password :"commercial123",
     email: "commercial@aviculture.fr",
     role: "commercial",
@@ -89,10 +85,10 @@ export const mockFarms: Farm[] = [
     {
     id: "farm-1",
     name: "Élevage Avicole la vie du poulet",
-    localisation: "Bayangam, 01000 Bayangam",
+    address: "Bayangam, 01000 Bayangam",
     type: "broiler",
     createdAt: "2022-01-15",
-    description :"Élevage Avicole la vie du poulet"
+    description: "Élevage Avicole la vie du poulet"
     },
 ];
 
@@ -369,7 +365,7 @@ export const mockTreatments: Treatment[] = [
     id: "treatment-1",
     flockId: "flock-1",
     veterinarianId: "3",
-    disease: "Coccidiose",
+    diseaseId: "disease-3",
     medication: "Amprolium 20%",
     dosage: "125g/100L d'eau pendant 5 jours",
     startDate: "2024-05-01",
@@ -381,7 +377,7 @@ export const mockTreatments: Treatment[] = [
     id: "treatment-2",
     flockId: "flock-2",
     veterinarianId: "3",
-    disease: "",
+    diseaseId: "disease-1",
     medication: "Tylosine",
     dosage: "500mg/L d'eau pendant 3 jours",
     startDate: "2024-04-25",
@@ -396,7 +392,7 @@ export const mockVaccinations: Vaccination[] = [
     id: "vacc-1",
     flockId: "flock-1",
     vaccine: "Newcastle + Bronchite IB",
-    disease: "Maladie de Newcastle + Bronchite infectieuse",
+    diseaseId: "disease-1",
     administrationDate: "2024-04-08",
     nextDueDate: "2024-04-22",
     method: "drinking_water",
@@ -408,7 +404,7 @@ export const mockVaccinations: Vaccination[] = [
     id: "vacc-2",
     flockId: "flock-2",
     vaccine: "Gumboro",
-    disease: "Maladie de Gumboro",
+    diseaseId: "disease-4",
     administrationDate: "2024-01-29",
     nextDueDate: "2024-02-12",
     method: "drinking_water",
@@ -419,7 +415,7 @@ export const mockVaccinations: Vaccination[] = [
     id: "vacc-3",
     flockId: "flock-3",
     vaccine: "Newcastle souche lentogène",
-    disease: "Maladie de Newcastle",
+    diseaseId: "disease-1",
     administrationDate: "2024-02-24",
     method: "spray",
     quantity: 5000,
