@@ -31,7 +31,7 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   {
     path: "/dashboard",
-    label: "Tableau de bord",
+    label: "Tableaudebord",
     icon: <LayoutDashboard className="w-5 h-5" />,
     roles: ["admin", "agent", "veterinarian", "commercial"],
   },
