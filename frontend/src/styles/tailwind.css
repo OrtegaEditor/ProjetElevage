@@ -1,4 +1,13 @@
-@import "tailwindcss/preflight";
-@import 'tw-animate-css';
-@import 'tailwindcss';
-@source '../**/*.{js,ts,jsx,tsx}';
+
+@import "tailwindcss";
+@source "../**/*.{js,ts,jsx,tsx}";
+@import "tw-animate-css";
+
+
+
+
+git commit -m "feat: landing page, login, layout global (sidebar + topbar)"
+git push
+
+
+Résultat ?
