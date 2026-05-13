@@ -28,96 +28,124 @@ interface MenuItem {
   roles: string[];
 }
 
-const menuItems: MenuItem[] = [
+interface MenuSection {
+  title: string;
+  items: MenuItem[];
+}
+
+const menuSections: MenuSection[] = [
   {
-    path: "/dashboard",
-    label: "Tableau de bord",
-    icon: <LayoutDashboard className="w-5 h-5" />,
-    roles: ["admin", "agent", "veterinarian", "commercial"],
+    title: "Général",
+    items: [
+      {
+        path: "/dashboard",
+        label: "Tableau de bord",
+        icon: <LayoutDashboard className="w-5 h-5" />,
+        roles: ["admin", "agent", "veterinarian", "commercial"],
+      },
+      {
+        path: "/alerts",
+        label: "Alertes",
+        icon: <AlertTriangle className="w-5 h-5" />,
+        roles: ["admin", "agent"],
+      },
+    ],
   },
+
   {
-    path: "/users",
-    label: "Utilisateurs",
-    icon: <Users className="w-5 h-5" />,
-    roles: ["admin"],
+    title: "Exploitation",
+    items: [
+      {
+        path: "/poultry-houses",
+        label: "Poulaillers",
+        icon: <Building2 className="w-5 h-5" />,
+        roles: ["admin", "agent"],
+      },
+      {
+        path: "/flocks",
+        label: "Lots de volailles",
+        icon: <Activity className="w-5 h-5" />,
+        roles: ["admin", "agent"],
+      },
+      {
+        path: "/weighing",
+        label: "Pesées",
+        icon: <Scale className="w-5 h-5" />,
+        roles: ["agent"],
+      },
+      {
+        path: "/stock",
+        label: "Stock",
+        icon: <Package className="w-5 h-5" />,
+        roles: ["admin", "agent"],
+      },
+    ],
   },
+
   {
-    path: "/poultry-houses",
-    label: "Poulaillers",
-    icon: <Building2 className="w-5 h-5" />,
-    roles: ["admin", "agent"],
+    title: "Santé animale",
+    items: [
+      {
+        path: "/treatments",
+        label: "Traitements",
+        icon: <Pill className="w-5 h-5" />,
+        roles: ["veterinarian"],
+      },
+      {
+        path: "/vaccinations",
+        label: "Vaccinations",
+        icon: <Syringe className="w-5 h-5" />,
+        roles: ["veterinarian"],
+      },
+      {
+        path: "/health-registry",
+        label: "Registre sanitaire",
+        icon: <Stethoscope className="w-5 h-5" />,
+        roles: ["veterinarian"],
+      },
+    ],
   },
+
   {
-    path: "/iot-monitoring",
-    label: "Monitoring IoT",
-    icon: <Thermometer className="w-5 h-5" />,
-    roles: ["admin", "agent"],
+    title: "Commercial",
+    items: [
+      {
+        path: "/sales",
+        label: "Ventes",
+        icon: <ShoppingCart className="w-5 h-5" />,
+        roles: ["commercial", "admin"],
+      },
+      {
+        path: "/clients",
+        label: "Clients",
+        icon: <UserCog className="w-5 h-5" />,
+        roles: ["commercial"],
+      },
+    ],
   },
+
   {
-    path: "/automation",
-    label: "Automatisation",
-    icon: <Settings className="w-5 h-5" />,
-    roles: ["admin"],
-  },
-  {
-    path: "/alerts",
-    label: "Alertes",
-    icon: <AlertTriangle className="w-5 h-5" />,
-    roles: ["admin", "agent"],
-  },
-  {
-    path: "/flocks",
-    label: "Lots de volailles",
-    icon: <Activity className="w-5 h-5" />,
-    roles: ["admin", "agent"],
-  },
-  {
-    path: "/weighing",
-    label: "Pesées",
-    icon: <Scale className="w-5 h-5" />,
-    roles: ["agent"],
-  },
-  {
-    path: "/treatments",
-    label: "Traitements",
-    icon: <Pill className="w-5 h-5" />,
-    roles: ["veterinarian"],
-  },
-  {
-    path: "/vaccinations",
-    label: "Vaccinations",
-    icon: <Syringe className="w-5 h-5" />,
-    roles: ["veterinarian"],
-  },
-  {
-    path: "/health-registry",
-    label: "Registre sanitaire",
-    icon: <Stethoscope className="w-5 h-5" />,
-    roles: ["veterinarian"],
-  },
-  {
-    path: "/sales",
-    label: "Ventes",
-    icon: <ShoppingCart className="w-5 h-5" />,
-    roles: ["commercial", "admin"],
-  },
-  {
-    path: "/clients",
-    label: "Clients",
-    icon: <UserCog className="w-5 h-5" />,
-    roles: ["commercial"],
-  },
-  {
-    path: "/stock",
-    label: "Stock",
-    icon: <Package className="w-5 h-5" />,
-    roles: ["admin", "agent"],
-  },
-  {
-    path: "/analytics",
-    label: "Analytics",
-    icon: <ClipboardList className="w-5 h-5" />,
-    roles: ["admin"],
+    title: "Administration",
+    items: [
+      {
+        path: "/users",
+        label: "Utilisateurs",
+        icon: <Users className="w-5 h-5" />,
+        roles: ["admin"],
+      },
+      {
+        path: "/automation",
+        label: "Automatisation",
+        icon: <Settings className="w-5 h-5" />,
+        roles: ["admin"],
+      },
+      {
+        path: "/analytics",
+        label: "Analytics",
+        icon: <ClipboardList className="w-5 h-5" />,
+        roles: ["admin"],
+      },
+    ],
   },
 ];
 
@@ -125,26 +153,25 @@ export function Sidebar() {
   const location = useLocation();
   const { user } = useAuth();
 
-  const filteredMenuItems = menuItems.filter((item) =>
-    user?.role ? item.roles.includes(user.role) : false
-  );
-
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 h-screen fixed left-0 top-0 overflow-y-auto">
-      <div className="p-6">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 bg-[#2E7D32] rounded-lg flex items-center justify-center">
-            <Activity className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="font-semibold text-gray-900">PoultryConnect</h1>
-            <p className="text-xs text-gray-500">Controlez a distance</p>
-          </div>
-        </div>
+    <nav className="space-y-6">
+  {menuSections.map((section) => {
+    const visibleItems = section.items.filter((item) =>
+      user?.role ? item.roles.includes(user.role) : false
+    );
 
-        <nav className="space-y-1">
-          {filteredMenuItems.map((item) => {
+    if (visibleItems.length === 0) return null;
+
+    return (
+      <div key={section.title}>
+        <h3 className="px-3 mb-2 text-xs font-semibold text-gray-400 uppercase">
+          {section.title}
+        </h3>
+
+        <div className="space-y-1">
+          {visibleItems.map((item) => {
             const isActive = location.pathname === item.path;
+
             return (
               <Link
                 key={item.path}
@@ -161,8 +188,10 @@ export function Sidebar() {
               </Link>
             );
           })}
-        </nav>
+        </div>
       </div>
-    </aside>
+    );
+  })}
+</nav>
   );
 }
