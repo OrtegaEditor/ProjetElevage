@@ -3,7 +3,7 @@ export default function UsersPage() {
     {
       label: "Total utilisateurs",
       value: 4,
-      icon: "👥",
+      icon: "",
     },
     {
       label: "Administrateurs",

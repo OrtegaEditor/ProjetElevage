@@ -205,3 +205,4 @@ export interface Weighing {
     stdDeviation: number;    // calculé
     notes?: string;
 }
+

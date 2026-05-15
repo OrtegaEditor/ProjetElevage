@@ -1,4 +1,4 @@
-export default function DashboardPage() {
+export function AdminDashboard() {
   const productionData = [
     { month: "Jan", value: 2400 },
     { month: "Feb", value: 2550 },

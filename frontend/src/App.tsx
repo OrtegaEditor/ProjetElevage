@@ -2,33 +2,38 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import React from "react";
 import { Toaster } from "sonner";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
-
-// Public Pages
 import { LandingPage } from "./pages/LandingPage";
 import { LoginPage } from "./pages/Auth/LoginPage";
-
-// Layout
 import { AppLayout } from "./components/layout/AppLayout";
-
-// Dashboard Pages
 import { AgentDashboard } from "./pages/Dashboard/AgentDashboard";
+import { AdminDashboard } from "./pages/Dashboard/AdminDashboard";
+import { SalesDashboard } from "./pages/Dashboard/SaleDashboard";
+import { VeterinarianDashboard } from "./pages/Dashboard/VeterinarianDashboard";
+import { WeighingPage } from "./pages/weighingpage";
+import { IoTMonitoring } from "./pages/iotMonitoring";
+// import { PoultryPage } from "./pages/PoultryPage";
 
-import React from "react";
+
+
+
+
+
+
 
 function DashboardRouter() {
   const { user } = useAuth();
-
   if (!user) return null;
-
   switch (user.role) {
     case "agent": return <AgentDashboard />;
+    case "admin": return <AdminDashboard />;
+    case "veterinarian": return <VeterinarianDashboard />;
+    case "commercial": return <SalesDashboard />;
+
     default: return <div>Dashboard - {user.role}</div>;
   }
 }
 
-// ======================================================
-// Protected Route
-// ======================================================
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
 
@@ -39,28 +44,26 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <AppLayout>{children}</AppLayout>;
 }
 
-// ======================================================
-// Application Routes
-// ======================================================
+
 function AppRoutes() {
   const { isAuthenticated } = useAuth();
 
   return (
     <Routes>
-      {/* =========================
-          Public Routes
-      ========================= */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
       <Route path="/dashboard" element={<ProtectedRoute><DashboardRouter /></ProtectedRoute>} />
+      <Route path="/weighing" element={<ProtectedRoute><WeighingPage /></ProtectedRoute>} />
+      <Route path="/iot-monitoring" element={<ProtectedRoute><IoTMonitoring /></ProtectedRoute>} />
+      {/* <Route path="/poultry-houses" element={<ProtectedRoute><PoultryPage /></ProtectedRoute>} /> */}
+
+
+
       <Route path="*" element={<Navigate to="#" replace />} />
     </Routes>
   );
 }
 
-// ======================================================
-// Main App Component
-// ======================================================
 export default function App() {
   return (
     <AuthProvider>

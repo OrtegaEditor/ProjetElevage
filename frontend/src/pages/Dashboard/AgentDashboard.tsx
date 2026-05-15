@@ -44,7 +44,7 @@ switch (openEvent) {
     return <MortalityForm />;
 
     case "weighing":
-    return <WeighingForm />;
+    // return <WeighingForm />;
 
     case "vaccination":
     return <VaccinationForm />;
