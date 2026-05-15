@@ -28,6 +28,7 @@
     { path: "/users", label: "Utilisateurs", icon: <Users className="w-5 h-5" />, roles: ["admin"] },
   ],
   },
+
   {
   label: "Élevage",
   items: [
@@ -37,6 +38,7 @@
     { path: "/stock", label: "Stock", icon: <Package className="w-5 h-5" />, roles: ["admin", "agent"] },
   ],
   },
+
   {
   label: "IoT & Alertes",
   items: [
@@ -45,6 +47,7 @@
     { path: "/automation", label: "Automatisation", icon: <Settings className="w-5 h-5" />, roles: ["admin"] },
   ],
   },
+
   {
   label: "Santé",
   items: [
@@ -53,6 +56,7 @@
     { path: "/health-registry", label: "Registre sanitaire", icon: <Stethoscope className="w-5 h-5" />, roles: ["veterinarian"] },
   ],
   },
+
   {
   label: "Commercial",
   items: [

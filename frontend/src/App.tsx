@@ -2,53 +2,81 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import React from "react";
 import { Toaster } from "sonner";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+
+// Public Pages
 import { LandingPage } from "./pages/LandingPage";
 import { LoginPage } from "./pages/Auth/LoginPage";
+
+// Layout
 import { AppLayout } from "./components/layout/AppLayout";
+
+// Dashboard Pages
 import { AgentDashboard } from "./pages/Dashboard/AgentDashboard";
-import { IoTMonitoring } from "./pages/iotMonitoring";
-import { WeighingPage } from "./pages/weighingpage";
-import { VeterinarianDashboard } from "./pages/Dashboard/VeterinarianDashboard";
 
-
-
+import React from "react";
 
 function DashboardRouter() {
   const { user } = useAuth();
+
   if (!user) return null;
+
   switch (user.role) {
     case "agent": return <AgentDashboard />;
-    case "veterinarian": return <VeterinarianDashboard />;
     default: return <div>Dashboard - {user.role}</div>;
   }
 }
 
+// ======================================================
+// Protected Route
+// ======================================================
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
   return <AppLayout>{children}</AppLayout>;
 }
 
+// ======================================================
+// Application Routes
+// ======================================================
 function AppRoutes() {
   const { isAuthenticated } = useAuth();
+
   return (
     <Routes>
+      {/* =========================
+          Public Routes
+      ========================= */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
       <Route path="/dashboard" element={<ProtectedRoute><DashboardRouter /></ProtectedRoute>} />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      <Route path="/iot-monitoring" element={<ProtectedRoute> <IoTMonitoring /></ProtectedRoute>}/>
-      <Route path="/weighing" element={<ProtectedRoute> <WeighingPage/> </ProtectedRoute>}/>
+      <Route path="*" element={<Navigate to="#" replace />} />
     </Routes>
   );
 }
 
+// ======================================================
+// Main App Component
+// ======================================================
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <AppRoutes />
-        <Toaster position="top-right" toastOptions={{ style: { background: "white", color: "#374151", border: "1px solid #E5E7EB" } }} />
+
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            style: {
+              background: "white",
+              color: "#374151",
+              border: "1px solid #E5E7EB",
+            },
+          }}
+        />
       </BrowserRouter>
     </AuthProvider>
   );
