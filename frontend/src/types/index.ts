@@ -10,6 +10,8 @@ export type EventType ="egg_collection"| "mortality"| "feeding"| "weighing" | "v
 
 export type AlertStatus ="active"| "resolved_auto"|"resolved_manual"| "ignored";
 
+export type StockStatus = "normal" | "low" | "critical";
+
 export interface User {
     id: string;
     name: string;
@@ -158,6 +160,7 @@ export interface StockItem {
     unit: string;
     minThreshold: number;
     farmId: string;
+    status: StockStatus;
     lastRestocked: string;
     expiryDate?: string;
 }

@@ -1,19 +1,33 @@
+import React, { ReactNode } from "react";
+
 interface StatCardProps {
 title: string;
-value: string;
-icon?: React.ReactNode;
-iconBg?: string;
+value: string | number;
+icon: ReactNode;
 valueColor?: string;
 }
 
-export function StatCard({ title, value, icon, iconBg, valueColor = "text-slate-800" }: StatCardProps) {
+const StatCard = ({
+title,
+value,
+icon,
+valueColor = "text-gray-800",
+}: StatCardProps) => {
 return (
-<div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex justify-between items-start">
-    <div>
-    <p className="text-slate-500 text-sm mb-1">{title}</p>
-    <h3 className={`text-2xl font-bold ${valueColor}`}>{value}</h3>
+    <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex justify-between items-start">
+        <div>
+            <p className="text-gray-500 text-sm mb-1">{title}</p>
+
+            <h2 className={`text-3xl font-bold ${valueColor}`}>
+                {value}
+            </h2>
+        </div>
+
+        <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+            {icon}
+        </div>
     </div>
-    {icon && <div className={`p-2 rounded-lg ${iconBg}`}>{icon}</div>}
-</div>
 );
-}
+};
+
+export default StatCard;
