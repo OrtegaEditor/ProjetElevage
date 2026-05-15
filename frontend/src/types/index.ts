@@ -2,6 +2,14 @@ export type UserRole = "admin" | "agent" | "veterinarian" | "commercial";
 
 export type PoultryType = "broiler" | "layer" | "turkey" | "duck" | "goose";
 
+export type TaskStatus = "pending" | "completed";
+
+export type TaskType ="feeding"| "weighing"| "ventilation"| "mortality"| "egg_collection"| "cleaning"| "vaccination";
+
+export type EventType ="egg_collection"| "mortality"| "feeding"| "weighing" | "vaccination";
+
+export type AlertStatus ="active"| "resolved_auto"|"resolved_manual"| "ignored";
+
 export interface User {
     id: string;
     name: string;
@@ -39,10 +47,11 @@ export interface PoultryHouse {//Salle d'elevages
 export interface Sensor {
     id: string;
     name: string;
-    type: "temperature" | "humidity" | "light";
+    type: "temperature" | "light" | "Ammoniac";
     poultryHouseId: string;
     value: number;
     unit: string;
+    calibrationOffset?: number;
     status: "online" | "offline" | "warning" | "error";
     lastUpdate: string;
     minValue?: number;
@@ -51,13 +60,13 @@ export interface Sensor {
 
 export interface Alert {
     id: string;
-    type: "critical" | "warning" | "info";
+    type: "temperature" | "light" | "ammoniac";
+    status : AlertStatus;
     title: string;
     message: string;
     idPoultryHouse: string;
     poultryHouseId?: string;
     farmId?: string;
-    resolved: boolean;
     createdAt: string;
     resolvedAt?: string;
 }
@@ -164,4 +173,35 @@ export interface AutomationRule {
     startTime: string;
     endTime: string;
 };
+}
+    export interface Task {
+    id: string;
+    type: TaskType;
+    title: string;
+    flockId: string;
+    poultryHouseId: string;
+    time: string;
+    status: TaskStatus;
+    }
+export interface Event {
+    id: string;
+    type: EventType;
+    flockId: string;
+    poultryHouseId: string;
+    createdAt: string;
+    createdBy: string;
+    notes?: string;
+}
+
+export interface Weighing {
+    id: string;
+    flockId: string;
+    agentId: string;
+    date: string;
+    weights: number[];       // poids individuels
+    averageWeight: number;   // calculé
+    minWeight: number;       // calculé
+    maxWeight: number;       // calculé
+    stdDeviation: number;    // calculé
+    notes?: string;
 }
