@@ -1,47 +1,39 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import React from "react";
 import { Toaster } from "sonner";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
-
-// Public Pages
 import { LandingPage } from "./pages/LandingPage";
 import { LoginPage } from "./pages/Auth/LoginPage";
-
-// Layout
 import { AppLayout } from "./components/layout/AppLayout";
-
-// Dashboard Pages
 import { AgentDashboard } from "./pages/Dashboard/AgentDashboard";
-import DashboardPage from "./pages/Dashboard/DashboardPage";
+import { AdminDashboard } from "./pages/Dashboard/AdminDashboard";
+import { SalesDashboard } from "./pages/Dashboard/SaleDashboard";
+import { VeterinarianDashboard } from "./pages/Dashboard/VeterinarianDashboard";
+import { WeighingPage } from "./pages/weighingpage";
+import { IoTMonitoring } from "./pages/iotMonitoring";
+// import { PoultryPage } from "./pages/PoultryPage";
 
-// Feature Pages
-import FarmPage from "./pages/FarmPage";
-import SalesManagementPage from "./pages/SalesManagementPage";
-import StockManagementPage from "./pages/StockManagementPage";
-import AlertsPage from "./pages/AlertsPage";
 
-// ======================================================
-// Dashboard Router (redirect users based on their role)
-// ======================================================
+
+
+
+
+
+
 function DashboardRouter() {
   const { user } = useAuth();
-
   if (!user) return null;
-
   switch (user.role) {
-    case "agent":
-      return <AgentDashboard />;
+    case "agent": return <AgentDashboard />;
+    case "admin": return <AdminDashboard />;
+    case "veterinarian": return <VeterinarianDashboard />;
+    case "commercial": return <SalesDashboard />;
 
-    case "admin":
-      return <DashboardPage />;
-
-    default:
-      return <DashboardPage />;
+    default: return <div>Dashboard - {user.role}</div>;
   }
 }
 
-// ======================================================
-// Protected Route
-// ======================================================
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
 
@@ -52,123 +44,26 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <AppLayout>{children}</AppLayout>;
 }
 
-// ======================================================
-// Application Routes
-// ======================================================
+
 function AppRoutes() {
   const { isAuthenticated } = useAuth();
 
   return (
     <Routes>
-      {/* =========================
-          Public Routes
-      ========================= */}
       <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
+      <Route path="/dashboard" element={<ProtectedRoute><DashboardRouter /></ProtectedRoute>} />
+      <Route path="/weighing" element={<ProtectedRoute><WeighingPage /></ProtectedRoute>} />
+      <Route path="/iot-monitoring" element={<ProtectedRoute><IoTMonitoring /></ProtectedRoute>} />
+      {/* <Route path="/poultry-houses" element={<ProtectedRoute><PoultryPage /></ProtectedRoute>} /> */}
 
-      <Route
-        path="/login"
-        element={
-          isAuthenticated ? (
-            <Navigate to="/dashboard" replace />
-          ) : (
-            <LoginPage />
-          )
-        }
-      />
 
-      {/* =========================
-          Dashboard Routes
-      ========================= */}
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <DashboardRouter />
-          </ProtectedRoute>
-        }
-      />
 
-      <Route
-        path="/dashboard-page"
-        element={
-          <ProtectedRoute>
-            <DashboardPage />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* =========================
-          Sidebar Feature Routes
-      ========================= */}
-
-      {/* Farms */}
-      <Route
-        path="/farms"
-        element={
-          <ProtectedRoute>
-            <FarmPage />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Sales Management */}
-      <Route
-        path="/sales"
-        element={
-          <ProtectedRoute>
-            <SalesManagementPage />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Stock Management */}
-      <Route
-        path="/stock"
-        element={
-          <ProtectedRoute>
-            <StockManagementPage />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Alerts */}
-      <Route
-        path="/alerts"
-        element={
-          <ProtectedRoute>
-            <AlertsPage />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* =========================
-          Redirect Old Route
-      ========================= */}
-      <Route
-        path="/adminDashboard"
-        element={<Navigate to="/dashboard" replace />}
-      />
-
-      {/* =========================
-          Fallback Route
-      ========================= */}
-      <Route
-        path="*"
-        element={
-          isAuthenticated ? (
-            <Navigate to="/dashboard" replace />
-          ) : (
-            <Navigate to="/login" replace />
-          )
-        }
-      />
+      <Route path="*" element={<Navigate to="#" replace />} />
     </Routes>
   );
 }
 
-// ======================================================
-// Main App Component
-// ======================================================
 export default function App() {
   return (
     <AuthProvider>

@@ -11,7 +11,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     <div className="min-h-screen bg-[#F5F7FA]">
       <Sidebar />
       <Topbar />
-      <main className="ml-64 pt-16">
+      <main className="ml-64 pt-16 bg-gray-200" >
         <div className="p-6">{children}</div>
       </main>
     </div>

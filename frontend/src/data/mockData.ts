@@ -13,6 +13,9 @@ import {
     Disease,
     AutomationRule,
     Band,
+    Event,
+    Task,
+    Weighing,
 } from "../types";
 
 export const mockbands : Band[] =[
@@ -90,12 +93,28 @@ export const mockFarms: Farm[] = [
     createdAt: "2022-01-15",
     description: "Élevage Avicole la vie du poulet"
     },
+    {
+    id: "farm-2",
+    name: "Poulailee Moleman",
+    address: "Bafang, 01200 Bafang",
+    type: "broiler",
+    createdAt: "2022-01-15",
+    description: "Élevage des pondeuses"
+    },
+    {
+    id: "farm-3",
+    name: "Batam avicole",
+    address: "MELONG",
+    type: "broiler",
+    createdAt: "2022-01-15",
+    description: "Élevage des poulets de chair"
+    },
 ];
 
 export const mockPoultryHouses: PoultryHouse[] = [
     {
     id: "house-1",
-    name: "Poulailler A - Poulets de chair",
+    name: "salle A - Poulets de chair",
     farmId: "farm-1",
     capacity: 10000,
     currentOccupancy: 9850,
@@ -104,10 +123,10 @@ export const mockPoultryHouses: PoultryHouse[] = [
     ventilationStatus: "auto",
     lightingStatus: "auto",
     heatingStatus: "auto",
-    },
-    {
+},
+{
     id: "house-2",
-    name: "Poulailler B - Poules pondeuses",
+    name: "Salle B - Poules pondeuses",
     farmId: "farm-1",
     capacity: 8000,
     currentOccupancy: 7890,
@@ -116,10 +135,11 @@ export const mockPoultryHouses: PoultryHouse[] = [
     ventilationStatus: "auto",
     lightingStatus: "auto",
     heatingStatus: "manual",
-    },
-    {
+},
+
+  {
     id: "house-3",
-    name: "Poulailler C - Dindes",
+    name: "salle C - Dindes",
     farmId: "farm-1",
     capacity: 5000,
     currentOccupancy: 4920,
@@ -128,10 +148,11 @@ export const mockPoultryHouses: PoultryHouse[] = [
     ventilationStatus: "auto",
     lightingStatus: "manual",
     heatingStatus: "auto",
-    },
+},
+
     {
     id: "house-4",
-    name: "Poulailler D - Canards",
+    name: "Salle D - Canards",
     farmId: "farm-1",
     capacity: 3000,
     currentOccupancy: 2850,
@@ -142,11 +163,10 @@ export const mockPoultryHouses: PoultryHouse[] = [
     heatingStatus: "off",
     },
 ];
-
 export const mockSensors: Sensor[] = [
     {
     id: "sensor-1",
-    name: "Température Poulailler A - Zone 1",
+    name: "Température Salle A ",
     type: "temperature",
     poultryHouseId: "house-1",
     value: 22.5,
@@ -158,8 +178,8 @@ export const mockSensors: Sensor[] = [
     },
     {
     id: "sensor-2",
-    name: "Humidité Poulailler A - Zone 1",
-    type: "humidity",
+    name: "Humidité Salle A ",
+    type: "light",
     poultryHouseId: "house-1",
     value: 62,
     unit: "%",
@@ -170,7 +190,7 @@ export const mockSensors: Sensor[] = [
     },
     {
     id: "sensor-3",
-    name: "NH3 Poulailler A - Zone 2",
+    name: "NH3 Salle A  ",
     type: "temperature",
     poultryHouseId: "house-1",
     value: 18,
@@ -182,7 +202,7 @@ export const mockSensors: Sensor[] = [
     },
     {
     id: "sensor-4",
-    name: "Luminosité Poulailler B",
+    name: "Luminosité Salle B",
     type: "light",
     poultryHouseId: "house-2",
     value: 45,
@@ -194,8 +214,8 @@ export const mockSensors: Sensor[] = [
     },
     {
     id: "sensor-5",
-    name: "Température Poulailler B",
-    type: "humidity",
+    name: "Température Salle B",
+    type: "temperature",
     poultryHouseId: "house-2",
     value: 26.8,
     unit: "°C",
@@ -206,8 +226,8 @@ export const mockSensors: Sensor[] = [
     },
     {
     id: "sensor-6",
-    name: "CO2 Poulailler C",
-    type: "temperature",
+    name: "NH3 Salle C",
+    type: "Ammoniac",
     poultryHouseId: "house-3",
     value: 2100,
     unit: "ppm",
@@ -219,53 +239,56 @@ export const mockSensors: Sensor[] = [
 ];
 
 export const mockAlerts: Alert[] = [
-    {
-    id: "alert-1",
-    type: "critical",
-    title: "Température critique - Poulailler B",
-    message: "La température dépasse le seuil maximum (26.8°C) - Risque de stress thermique",
-    idPoultryHouse: "house-1",
-    resolved: false,
-    createdAt: new Date(
-      Date.now() - 1000 * 60 * 15,
-    ).toISOString(),
-    },
-    {
-    id: "alert-2",
-    type: "warning",
-    title: "Niveau d'humidite élevé - Poulailler A",
-    message:
-    "Activer le chauffage",
-    idPoultryHouse: "house-2",
-    resolved: false,
-    createdAt: new Date(
-      Date.now() - 1000 * 60 * 45,
-    ).toISOString(),
-    },
-    {
-    id: "alert-3",
-    type: "warning",
-    title: "CO2 élevé - Poulailler C",
-    message: "Concentration CO2 à 2100ppm (seuil max: 2000ppm)",
-    idPoultryHouse: "house-3",
-    resolved: false,
-    createdAt: new Date(
-      Date.now() - 1000 * 60 * 120,
-    ).toISOString(),
-    },
-    {
-    id: "alert-4",
-    title: " - Lot PL2024-03",
-    type: "warning",
-    message: "12 volailles déclarées mortes ce matin",
-    idPoultryHouse: "house-4",
-    resolved: false,
-    createdAt: new Date(
-      Date.now() - 1000 * 60 * 180,
-    ).toISOString(),
-    },
-];
+{
+    id: "1",
+    type: "temperature",
+    status: "active",
+    title: "Température élevée",
+    message: "Température salle A au-dessus du seuil (32°C)",
+    idPoultryHouse: "PH1",
+    poultryHouseId: "PH1",
+    farmId: "F1",
+    createdAt: "2026-05-14T08:10:00Z",
+    resolvedAt: "2026-05-14T08:15:00Z",
+},
 
+{
+    id: "2",
+    type: "light",
+    status: "resolved_auto",
+    title: "Humidité anormale",
+    message: "Humidité salle B trop basse (35%)",
+    idPoultryHouse: "PH2",
+    poultryHouseId: "PH2",
+    farmId: "F1",
+    createdAt: "2026-05-14T09:00:00Z",
+    resolvedAt: "2026-05-14T09:05:00Z",
+},
+
+{
+    id: "3",
+    type: "ammoniac",
+    status: "resolved_manual",
+    title: "Taux d’ammoniac élevé",
+    message: "Concentration NH3 critique détectée dans bâtiment C",
+    idPoultryHouse: "PH3",
+    poultryHouseId: "PH3",
+    farmId: "F1",
+    createdAt: "2026-05-14T10:20:00Z",
+},
+
+{
+    id: "4",
+    type: "temperature",
+    status: "ignored",
+    title: "Baisse de température",
+    message: "Température en dessous du seuil (18°C)",
+    idPoultryHouse: "PH1",
+    poultryHouseId: "PH1",
+    farmId: "F1",
+    createdAt: "2026-05-14T11:00:00Z",
+},
+];
 export const mockFlocks: Flock[] = [
     {
     id: "flock-1",
@@ -357,11 +380,11 @@ export const mockDiseases: Disease[] = [
         "Chute de ponte brutale",
     ],
     severity: "high",
-  },
+},
 ];
 
 export const mockTreatments: Treatment[] = [
-  {
+{
     id: "treatment-1",
     flockId: "flock-1",
     veterinarianId: "3",
@@ -372,8 +395,8 @@ export const mockTreatments: Treatment[] = [
     animalsCount:5,
     endDate: "2024-05-06",
     notes: "Traitement préventif suite à détection de coccidies à l'analyse",
-  },
-  {
+},
+{
     id: "treatment-2",
     flockId: "flock-2",
     veterinarianId: "3",
@@ -489,6 +512,7 @@ export const mockStock: StockItem[] = [
     quantity: 4500,
     unit: "kg",
     minThreshold: 2000,
+    status: "normal",
     farmId: "farm-1",
     lastRestocked: "2024-05-01",
     },
@@ -499,6 +523,7 @@ export const mockStock: StockItem[] = [
     quantity: 1800,
     unit: "kg",
     minThreshold: 1000,
+    status: "low",
     farmId: "farm-1",
     lastRestocked: "2024-04-28",
     },
@@ -510,6 +535,7 @@ export const mockStock: StockItem[] = [
     unit: "flacons (1000 doses)",
     minThreshold: 10,
     farmId: "farm-1",
+    status: "critical",
     lastRestocked: "2024-03-15",
     expiryDate: "2025-03-15",
     },
@@ -521,6 +547,7 @@ export const mockStock: StockItem[] = [
     unit: "kg",
     minThreshold: 5,
     farmId: "farm-1",
+    status: "low",
     lastRestocked: "2024-04-10",
     expiryDate: "2026-04-10",
     },
@@ -555,4 +582,106 @@ export const mockAutomationRules: AutomationRule[] = [
     condition: "Si température < 20°C",
     action: "Activer chauffage radiant",
 },
+];
+
+export const mockTasks: Task[] = [
+{
+    id: "1",
+    type: "weighing",
+    title: "Pesée du lot",
+    flockId :"flock-2",
+    poultryHouseId: "Bât. C",
+    time: "09:00",
+    status: "pending",
+},
+
+{
+    id: "2",
+    type: "feeding",
+    title: "Contrôle alimentation",
+    flockId :"flock-1",
+    poultryHouseId: "Bât. C",
+    time: "11:00",
+    status: "completed",
+},
+
+{
+    id: "3",
+    type: "ventilation",
+    title: "installer ventilation",
+    flockId :"flock-2",
+    poultryHouseId: "Bât. B",
+    time: "14:00",
+    status: "pending",
+},
+
+{
+    id: "4",
+    type: "mortality",
+    title: "Rapport mortalité du jour",
+    flockId :"flock-2" ,
+    poultryHouseId: "Bât. A",
+    time: "17:00",
+    status: "pending",
+},
+];
+
+export const mockWeighings: Weighing[] = [
+{
+    id: "weigh-1",
+    flockId: "flock-1",
+    agentId: "2",
+    date: "2024-04-15",
+    weights: [1.2, 1.3, 1.25, 1.4, 1.1, 1.35, 1.28, 1.32, 1.18, 1.27],
+    averageWeight: 1.27,
+    minWeight: 1.1,
+    maxWeight: 1.4,
+    stdDeviation: 0.08,
+    notes: "Pesée semaine 2"
+  },
+  {
+    id: "weigh-2",
+    flockId: "flock-1",
+    agentId: "2",
+    date: "2024-04-22",
+    weights: [1.6, 1.7, 1.65, 1.8, 1.55, 1.72, 1.68, 1.75, 1.58, 1.63],
+    averageWeight: 1.67,
+    minWeight: 1.55,
+    maxWeight: 1.80,
+    stdDeviation: 0.08,
+    notes: "Pesée semaine 3"
+  },
+  {
+    id: "weigh-3",
+    flockId: "flock-1",
+    agentId: "2",
+    date: "2024-04-29",
+    weights: [1.9, 2.0, 1.95, 2.1, 1.85, 1.98, 2.02, 1.92, 1.88, 1.97],
+    averageWeight: 1.96,
+    minWeight: 1.85,
+    maxWeight: 2.10,
+    stdDeviation: 0.08,
+  },
+  {
+    id: "weigh-4",
+    flockId: "flock-2",
+    agentId: "2",
+    date: "2024-04-10",
+    weights: [1.4, 1.5, 1.45, 1.6, 1.35, 1.52, 1.48, 1.55, 1.38, 1.43],
+    averageWeight: 1.47,
+    minWeight: 1.35,
+    maxWeight: 1.60,
+    stdDeviation: 0.08,
+  },
+  {
+    id: "weigh-5",
+    flockId: "flock-2",
+    agentId: "2",
+    date: "2024-04-20",
+    weights: [1.7, 1.8, 1.75, 1.9, 1.65, 1.82, 1.78, 1.85, 1.68, 1.73],
+    averageWeight: 1.77,
+    minWeight: 1.65,
+    maxWeight: 1.90,
+    stdDeviation: 0.08,
+  },
 ];

@@ -135,7 +135,7 @@ return (
 
 <section
     id="accueil"
-    className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-green-50 to-blue-50"
+    className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-linear-to-br from-green-50 to-blue-50"
 >
     <div className="max-w-7xl mx-auto">
     <div className="text-center max-w-3xl mx-auto">
@@ -284,7 +284,7 @@ return (
     </div>
 </section>
 
-<section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-green-50 to-blue-50">
+<section className="py-20 px-4 sm:px-6 lg:px-8 bg-linear-to-br from-green-50 to-blue-50">
     <div className="max-w-4xl mx-auto text-center">
     <h2 className="text-4xl font-bold text-gray-900 mb-6">
         Prêt à transformer votre élevage ?

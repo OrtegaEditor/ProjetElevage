@@ -1,2 +1,0 @@
-i can not connect my farmPage,salemanagement and stock management
-when i import my farmPage,salemanagement and stock management in my app.tsx i cannot access it in my sidebar,when i click on them in the sidebar  it does not open these pages
