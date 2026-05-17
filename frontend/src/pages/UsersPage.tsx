@@ -1,9 +1,29 @@
+import StatCard from "../components/common/StatCard";
+import { User } from "../types";
+
+const getStockBadgeVariant = (
+    status: "normal" | "low" | "critical"
+): "success" | "warning" | "danger" | "default" => {
+    switch (status) {
+        case "normal":
+            return "success";
+
+        case "low":
+            return "warning";
+
+        case "critical":
+            return "danger";
+
+        default:
+            return "default";
+    }
+};
 export default function UsersPage() {
   const stats = [
     {
       label: "Total utilisateurs",
       value: 4,
-      icon: "👥",
+      icon: "",
     },
     {
       label: "Administrateurs",
@@ -16,41 +36,6 @@ export default function UsersPage() {
     {
       label: "Vétérinaires",
       value: 1,
-    },
-  ];
-
-  const users = [
-    {
-      initials: "J",
-      name: "Jean Dupont",
-      email: "admin@ferme.fr",
-      role: "Administrateur",
-      roleColor: "bg-green-100 text-green-700",
-      farms: "2 ferme(s)",
-    },
-    {
-      initials: "M",
-      name: "Marie Martin",
-      email: "agent@ferme.fr",
-      role: "Agent d'élevage",
-      roleColor: "bg-blue-100 text-blue-700",
-      farms: "1 ferme(s)",
-    },
-    {
-      initials: "D",
-      name: "Dr. Pierre Dubois",
-      email: "vet@ferme.fr",
-      role: "Vétérinaire",
-      roleColor: "bg-orange-100 text-orange-700",
-      farms: "2 ferme(s)",
-    },
-    {
-      initials: "S",
-      name: "Sophie Bernard",
-      email: "commercial@ferme.fr",
-      role: "Commercial",
-      roleColor: "bg-gray-100 text-gray-700",
-      farms: "2 ferme(s)",
     },
   ];
 
@@ -139,7 +124,7 @@ export default function UsersPage() {
             </thead>
 
             <tbody>
-              {users.map((user) => (
+              {users.map((user: User) => (
                 <tr
                   key={user.email}
                   className="border-b border-gray-100 last:border-0"

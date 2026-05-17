@@ -24,9 +24,9 @@ toast.error("Email ou mot de passe incorrect");
 };
 
 return (
-<div className="min-h-screen bg-[#F5F7FA] flex items-center justify-center p-4">
+<div className="min-h-screen bg-[#e9edf4] flex items-center justify-center p-4">
 <div className="w-full max-w-md">
-<div className="bg-white rounded-2xl shadow-lg p-8">
+<div className="bg-[#c9d7ce] rounded-2xl shadow-lg p-8">
 <div className="flex justify-center mb-8">
 <div className="w-16 h-16 bg-[#2E7D32] rounded-2xl flex items-center justify-center">
     <Leaf className="w-10 h-10 text-white" />
@@ -34,12 +34,12 @@ return (
 </div>
 
 <div className="text-center mb-8">
-<h1 className="text-2xl font-semibold text-gray-900 mb-2">
-    PoultryConnect IoT
-</h1>
-<p className="text-gray-600">
-    Plateforme de gestion d'élevage avicole connecté
-</p>
+    <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+        PoultryConnect IoT
+    </h1>
+    <p className="text-gray-600">
+        Plateforme de gestion d'élevage avicole connecté
+    </p>
 </div>
 
 <form onSubmit={handleSubmit} className="space-y-4">
@@ -86,30 +86,6 @@ return (
     Se connecter
 </Button>
 </form>
-
-<div className="mt-6 p-4 bg-blue-50 rounded-lg">
-<p className="text-xs font-medium text-blue-900 mb-2">
-    Comptes de démonstration :
-</p>
-<ul className="text-xs text-blue-800 space-y-1">
-    <li>• Admin: admin@aviculture.fr</li>
-    <li>• Agent: agent@aviculture.fr</li>
-    <li>• Vétérinaire: vet@aviculture.fr</li>
-    <li>• Commercial: commercial@aviculture.fr</li>
-</ul>
-<p className="text-xs text-blue-600 mt-2 italic">
-    <p className="text-xs font-medium text-blue-900 mb-2">
-    Mot de passe pour tous les comptes :
-    </p>
-    <ul className="text-xs text-blue-800 space-y-1">
-    <li>admin123</li>
-    <li>agent123</li>
-    <li>vet123</li>
-    <li>commercial123</li>
-    </ul>
-
-</p>
-</div>
 </div>
 </div>
 </div>
