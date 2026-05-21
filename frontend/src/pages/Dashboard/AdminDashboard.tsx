@@ -14,10 +14,26 @@ import { DashboardActions } from "../../components/common/DashboardActions";
 import { SensorFormModal } from "../../components/forms/SensorFormModal";
 import { FlocksForm } from "../../components/forms/FlocksForm";
 import { Eye, Settings, Check } from "lucide-react";
+import { Flock, PoultryHouse } from "../../types";
+import { PoultryHouseForm } from "../../components/forms/PoultryHousesForm";
+import { InviteCollaboratorForm } from "../../components/forms/InviteCollaboratorForm";
 
 export function AdminDashboard() {
+
+  const [flocks, setFlocks] = useState<Flock[]>(mockFlocks);
+  const [selectedFlock, setSelectedFlock] = useState<Flock| null>(null);
+
+  const [openPoultryHouse, setopenPoultryHouse] = useState(false);
+  const [selectedPoultryHouse, setSelectedPoultryHouse] = useState<PoultryHouse| null>(null);
+
+  const [inviteOpen, setInviteOpen] = useState<Boolean>(false);
+  const [selectedUsers, setSelectedUsers] = useState<Boolean>(false);
+  const [modalOpen, setModalOpen] = useState(false);
+
   const [notifOpen, setNotifOpen] = useState(false);
   const [activeModal, setActiveModal] = useState<"flock" | "sensor" | "house" | "user" | null>(null);
+
+
   const occupancyData = mockPoultryHouses.map((house) => ({
     name: house.name,
     occupancy: Math.round(
@@ -425,13 +441,12 @@ export function AdminDashboard() {
         </Card>{activeModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
             <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
-              
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-gray-900">
                   {activeModal === "flock" && "Ajouter un lot"}
                   {activeModal === "sensor" && "Ajouter un capteur"}
                   {activeModal === "house" && "Ajouter une salle"}
-                  {activeModal === "user" && "Ajouter un utilisateur"}
+                  {activeModal === "user" && "Inviter un collaborateur"}
                 </h2>
 
                 <button
@@ -445,9 +460,9 @@ export function AdminDashboard() {
 
               {activeModal === "flock" && (
                 <div>
-                    {activeModal === "sensor" && (
-                    <SensorFormModal
-                    onSave={(sensor) => {
+                    {activeModal === "flock" && (
+                    <FlocksForm
+                    onSave={(flock) => {
                     setActiveModal(null);
                       }}
                       onClose={() => setActiveModal(null)}
@@ -470,14 +485,24 @@ export function AdminDashboard() {
               )}
 
               {activeModal === "house" && (
-                <div>
-                  FORMULAIRE SALLE
+                <div>{activeModal === "house" && (
+                    <PoultryHouseForm
+                    onSave={(poultryhouse : PoultryHouse) => {
+                    setActiveModal(null);
+                      }}
+                      onClose={() => setActiveModal(null)}
+                    />
+                  )}
                 </div>
               )}
 
               {activeModal === "user" && (
                 <div>
-                  FORMULAIRE UTILISATEUR
+                  {activeModal === "user" && (
+                    <InviteCollaboratorForm
+                    onClose={() => setActiveModal(null)}
+                    onSubmit={(data) => {console.log("invitation envoyée", data);}}/>
+                  )}
                 </div>
               )}
 

@@ -11,7 +11,6 @@ interface SensorFormModalProps {
 sensor?: Sensor | null;
 onClose: () => void;
 onSave: (sensor: Sensor) => void;
-isOpen: () =>boolean;
 }
 
 const sensorTypes = ["temperature", "light", "ammoniac"];

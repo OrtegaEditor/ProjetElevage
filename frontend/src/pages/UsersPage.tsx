@@ -1,7 +1,10 @@
 import {StatCard} from "../components/common/StatCard";
-import { User } from "../types";
+import { Flock, User } from "../types";
 import { mockUsers } from "../data/mockData";
 import { Button } from "../components/common/button";
+import { useState } from "react";
+import { InviteCollaboratorForm } from "../components/forms/InviteCollaboratorForm";
+import { Plus } from "lucide-react";
 
 // const getStockBadgeVariant = (
 //     status: "normal" | "low" | "critical"
@@ -35,6 +38,11 @@ const getRoleColor = (role: string) => {
 
 export default function UsersPage() {
   const users = mockUsers;
+    const [inviteOpen, setInviteOpen] = useState<Boolean>(false);
+    const [selectedUsers, setSelectedUsers] = useState<Boolean>(false);
+    const [modalOpen, setModalOpen] = useState(false);
+
+
   const stats = [
     {
       label: "Total utilisateurs",
@@ -46,7 +54,7 @@ export default function UsersPage() {
       value: 1,
     },
     {
-      label: "Agents terrain",
+      label: "Agents Elevages",
       value: 1,
     },
     {
@@ -68,10 +76,11 @@ export default function UsersPage() {
           </p>
         </div>
 
-        <Button className="inline-flex items-center gap-2 rounded-xl  px-5 py-3 font-semibold text-white shadow-sm transition ">
-          <span className="text-xl leading-none">+</span>
-          Inviter un collaborateur
-        </Button>
+    <Button onClick={() => {setInviteOpen(true); }}
+      className="inline-flex items-center gap-2 rounded-xl px-5 py-3 font-semibold text-white shadow-sm transition" >
+      <Plus />
+      Inviter un collaborateur
+    </Button>
       </div>
 
       {/* Cartes statistiques */}
@@ -227,6 +236,25 @@ export default function UsersPage() {
           ))}
         </div>
       </section>
+              {inviteOpen && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg w-full max-w-md relative">
+
+              <button
+                className="absolute top-2 right-2"
+                onClick={() => setInviteOpen(false)}
+              >
+                ✕
+              </button>
+              <InviteCollaboratorForm
+                onClose={() => setInviteOpen(false)}
+                onSubmit={(data) => {
+                  console.log("invitation envoyée", data);
+                }}
+              />
+            </div>
+          </div>
+        )}
     </div>
   );
 }

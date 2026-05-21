@@ -6,12 +6,14 @@ import { mockFlocks, mockPoultryHouses } from "../data/mockData";
 import { useState } from "react";
 import { Flock, Sensor } from "../types";
 import { FlocksForm } from "../components/forms/FlocksForm";
+import { SensorFormModal } from "../components/forms/SensorFormModal";
+
 
 
 
 export function Flockspage() {
 
-
+const [isSensorModalOpen, setSensorModalOpen] = useState(false);
 const [flocks, setFlocks] = useState<Flock[]>(mockFlocks);
 const [modalOpen, setModalOpen] = useState(false);
 const [selectedFlock, setSelectedFlock] = useState<Flock| null>(null);
@@ -65,13 +67,12 @@ return (
     Suivi des lots et performances avicoles
     </p>
 </div>
-<Button onClick={() => { setSelectedFlock(null); setModalOpen(true); }}>
-    <Plus className="w-4 h-4 mr-2" />
-    Nouveau lot
-</Button>
-    <Button variant="primary" >
-        <Plus className="w-5 h-5" /> Nouveau capteur
-    </Button>
+    <div className="flex items-center gap-3">
+        <Button variant="primary" onClick={() => { setSelectedFlock(null); setModalOpen(true); }}>
+            <Plus className="w-5 h-5 mr-2" />
+            Nouveau lot
+        </Button>
+    </div>
 </div>
 
 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -244,6 +245,24 @@ return (
         </div>
     </div>
     )}
+        {isSensorModalOpen && (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="bg-white w-full max-w-lg rounded-lg p-6 relative">
+        {/* bouton fermer */}
+        <button
+            className="absolute top-2 right-2"
+            onClick={() => setSensorModalOpen(false)}
+        >
+            ✕
+        </button>
+        {/* ton formulaire existant */}
+        <SensorFormModal
+            onSave={() => setSensorModalOpen(false)}
+            onClose={() => setSensorModalOpen(false)}
+        />
+    </div>
+  </div>
+)}
 </div>
 );
 }

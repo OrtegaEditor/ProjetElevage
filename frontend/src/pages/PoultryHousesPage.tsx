@@ -7,8 +7,12 @@ import { Badge } from "../components/common/badge";
 import { Input } from "../components/common/input";
 import { mockFarms, mockPoultryHouses, mockFlocks } from "../data/mockData";
 import { PoultryHouse } from "../types";
+import { FarmForm } from "../components/forms/farmForm";
+import { PoultryHouseForm } from "../components/forms/PoultryHousesForm";
 
 export function PoultryHousesPage() {
+
+const [open, setOpen] = useState(false);
 const navigate = useNavigate();
 const { farmId } = useParams<{ farmId: string }>();
 const [rooms, setRooms] = useState(
@@ -35,11 +39,20 @@ mockFlocks
 return (
 <div className="space-y-6">
     {/* HEADER */}
-        <div className="flex justify-end">
-            <Button> <Plus className="w-4 h-4 mr-2" />
-                Nouvelle salle
+        <Button  onClick={() => setOpen(true)}>
+        <Plus className="w-4 h-4 mr-2" />
+        Nouvellle Salle
+        </Button>{open && (
+            <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+            <div className="bg-white w-full max-w-lg p-6 rounded-xl shadow-lg relative">
+            <Button onClick={() => setOpen(false)}  className="absolute top-2 right-2 text-white" >
+                ✕
             </Button>
-        </div>
+                <PoultryHouseForm  onClose={() => setOpen(false)} onSave={(data) => {
+                    alert("SAVE POULTRY HOUSE:"); setOpen(false);}}/>
+            </div>
+            </div>
+        )}
     <div className="flex items-center gap-4 mb-6">
     <Button
         onClick={() => navigate("/poultry-houses")}

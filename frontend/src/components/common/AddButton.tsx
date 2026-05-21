@@ -37,7 +37,7 @@ const dropdownItems = [
 },
 {
     id: "user",
-    label: "Ajouter un utilisateur",
+    label: "Inviter un collaborateur",
     onClick: onAddUser || (() => {}),
     icon: <Plus className="w-4 h-4" />,
 },
