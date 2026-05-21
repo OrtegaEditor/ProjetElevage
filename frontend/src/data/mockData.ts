@@ -16,130 +16,190 @@ import {
     Event,
     Task,
     Weighing,
+    Espece
 } from "../types";
 
-export const mockbands : Band[] =[
-    {
-        id:"band-1",
-        farmId:"farm-1",
-        quantity :4000,
-        especeId:"broiler",
-        createdDate :"10-12-2024"
-    },
-        {
-        id:"band-4",
-        farmId:"farm-2",
-        quantity :4000,
-        especeId:"turkey",
-        createdDate :"20-12-2024"
-    },
-    {
-        id:"band-6",
-        farmId:"farm-3",
-        quantity :4000,
-        especeId:"goose",
-        createdDate :"10-12-2024"
-    },
-]
 export const mockUsers: User[] = [
-    {
+  {
     id: "1",
     name: "FOSSO Marcelin",
-    password :"admin123",
     email: "admin@aviculture.fr",
+    password : "admin123",
     role: "admin",
-    telephone : "674666464",
     farms: ["farm-1"],
+    telephone: "64655353",
     active: true,
-    },
-    {
+  },
+  {
     id: "2",
-    name: "Tagne Pierre",
-    password :"agent123",
+    name: "Tagne Pierre ",
     email: "agent@aviculture.fr",
+    password : "agent123",
     role: "agent",
-    telephone : "674666464",
-    active: true,
     farms: ["farm-1"],
-    },
-    {
+    telephone: "64655353",
+    active : true,
+  },
+  {
     id: "3",
-    name: "Dr Kamdem Simo",
-    password :"vet123",
+    name: "Dr. Pierre Dubois",
     email: "vet@aviculture.fr",
     role: "veterinarian",
+    password : "vet123",
     farms: ["farm-1"],
-    telephone : "674666464",
-    active: true,
-    },
-{
+    active : true,
+    telephone: "64655353",
+    
+
+  },
+  {
     id: "4",
     name: "Geh Sophie ",
-    password :"commercial123",
     email: "commercial@aviculture.fr",
     role: "commercial",
+    password : "com123",
     farms: ["farm-1"],
-    telephone : "674666464",
-    active: true,
-},
+    active : true,
+    telephone:"64655353",
+
+
+  },
+];
+
+export const mockBands: Band[] = [
+
+  {
+    id: "band-1",
+    name : "Arrivage de poulets de chair",
+    farmId: "farm-1",
+    especeId: "broiler",
+    quantity: 10000,
+    createdDate: "2024-04-01",
+    fournisseur: "Couvoirs du Cameroun",
+    prixUnitaire: 450,
+    status: "active",
+    notes: "Lot de poussins d'un jour, bonne qualité",
+  },
+
+  {
+    id: "band-2",
+    name : "Arrivage de poulets de canards",
+    farmId: "farm-1",
+    especeId: "duck",
+    quantity: 8000,
+    createdDate: "2024-01-15",
+    fournisseur: "Avicam Bafoussam",
+    prixUnitaire: 500,
+    status: "active",
+    notes: "Poulettes 18 semaines",
+  },
+
+  {
+    id: "band-3",
+    name : "Arrivage de poulets de dindes",
+    farmId: "farm-1",
+    especeId: "turkey",
+    quantity: 5000,
+    createdDate: "2024-02-10",
+    fournisseur: "Couvoirs du Cameroun",
+    prixUnitaire: 800,
+    status: "active",
+  },
+
+  {
+    id: "band-4",
+    name : "Arrivage de poulets d'oies",
+    farmId: "farm-1",
+    especeId: "goose",
+    quantity: 3000,
+    createdDate: "2024-03-05",
+    fournisseur: "Élevage Nkoudem",
+    prixUnitaire: 600,
+    status: "active",
+  },
+
 ];
 
 export const mockFarms: Farm[] = [
-    {
+
+  {
     id: "farm-1",
-    name: "Élevage Avicole la vie du poulet",
-    address: "Bayangam, 01000 Bayangam",
-    type: "broiler",
+    name: "Poulailler Principal Bayangam",
+    address: "Bayangam, Région Ouest, Cameroun",
+    type: ["broiler","turkey"],
+    description: "Poulailler principal de l'exploitation avicole",
     createdAt: "2022-01-15",
-    description: "Élevage Avicole la vie du poulet"
-    },
-    {
+    totalCapacity: 26000,
+    managerId: "1",
+    active : true,
+ },
+   {
     id: "farm-2",
-    name: "Poulailee Moleman",
-    address: "Bafang, 01200 Bafang",
-    type: "broiler",
+    name: "Poulailler de Mbouda",
+    address: "Bamboutos, Région Ouest, Cameroun",
+    type: ["layer","duck"],
+    description: "Poulailler specialise dans la production des pondeuse et canard",
     createdAt: "2022-01-15",
-    description: "Élevage des pondeuses"
-    },
-    {
+    totalCapacity: 26000,
+    managerId: "1",
+    active : true,
+ },
+
+  {
+
     id: "farm-3",
-    name: "Batam avicole",
-    address: "MELONG",
-    type: "broiler",
-    createdAt: "2022-01-15",
-    description: "Élevage des poulets de chair"
-    },
+    name: "Poulailler Secondaire Bafoussam",
+    address: "Bafoussam, Région Ouest, Cameroun",
+    type: ["layer","broiler"],
+    description: "Poulailler secondaire spécialisé pondeuses",
+    createdAt: "2023-06-10",
+    totalCapacity: 12000,
+    managerId: "1",
+    active : true,
+  },
+
 ];
 
 export const mockPoultryHouses: PoultryHouse[] = [
-    {
+
+  {
+
     id: "house-1",
-    name: "salle A - Poulets de chair",
+    name: "Salle A - Poulets de chair",
     farmId: "farm-1",
     capacity: 10000,
     currentOccupancy: 9850,
-    poultryType: "layer",
+    poultryType: "broiler",
     hasAutomation: true,
     ventilationStatus: "auto",
     lightingStatus: "auto",
     heatingStatus: "auto",
-},
-{
+    active: true,
+    description: "Salle principale poulets de chair",
+
+  },
+
+  {
+
     id: "house-2",
     name: "Salle B - Poules pondeuses",
     farmId: "farm-1",
     capacity: 8000,
     currentOccupancy: 7890,
-    poultryType: "duck",
+    poultryType: "layer",
     hasAutomation: true,
     ventilationStatus: "auto",
     lightingStatus: "auto",
     heatingStatus: "manual",
-},
+    active: true,
+    description: "Salle pondeuses haute densité",
+
+  },
 
   {
+
     id: "house-3",
-    name: "salle C - Dindes",
+    name: "Salle C - Dindes",
     farmId: "farm-1",
     capacity: 5000,
     currentOccupancy: 4920,
@@ -148,21 +208,70 @@ export const mockPoultryHouses: PoultryHouse[] = [
     ventilationStatus: "auto",
     lightingStatus: "manual",
     heatingStatus: "auto",
-},
+    active: true,
 
-    {
+  },
+
+  {
+
     id: "house-4",
     name: "Salle D - Canards",
     farmId: "farm-1",
     capacity: 3000,
     currentOccupancy: 2850,
-    poultryType: "goose",
+    poultryType: "duck",
     hasAutomation: false,
     ventilationStatus: "manual",
     lightingStatus: "manual",
     heatingStatus: "off",
+    active: true,
+
+  },
+
+   {
+    id: "house-5",
+    name: "Salle E - Pondeuses",
+    farmId: "farm-2",
+    capacity: 12000,
+    currentOccupancy: 10500,
+    poultryType: "layer",
+    hasAutomation: true,
+    ventilationStatus: "auto",
+    lightingStatus: "auto",
+    heatingStatus: "auto",
+    active: true,
+    description: "Grande salle pondeuses farm-2",
+
     },
+
 ];
+
+export const mockEspece: Espece[] = [{
+  id : "broiler",
+  name : "Poules pondeuses",
+  averageCycle : 45,
+},
+{
+  id : "turkey",
+  name : "Dindes",
+  averageCycle : 45,
+},
+{ 
+  id : "goose",
+  name : "Oies",
+  averageCycle : 45,
+},
+{  
+  id : "layer",
+  name : "Poules pondeuses",
+  averageCycle : 45,
+},
+{  
+  id : "duck",
+  name : "Canards",
+  averageCycle : 45,
+},
+]
 export const mockSensors: Sensor[] = [
     {
     id: "sensor-1",
@@ -300,6 +409,7 @@ export const mockFlocks: Flock[] = [
     quantity: 9850,
     startDate: "2024-04-01",
     status: "active",
+    cycle: 45,
     averageWeight: 1.85,
     mortality: 150,
     age: 35,
@@ -311,6 +421,7 @@ export const mockFlocks: Flock[] = [
     farmId: "farm-1",
     poultryHouseId: "house-2",
     poultryType: "layer",
+    cycle: 45,
     quantity: 7890,
     startDate: "2024-01-15",
     status: "active",
@@ -323,6 +434,7 @@ export const mockFlocks: Flock[] = [
     name: "PL2024-01",
     bandId : "band-3",
     farmId: "farm-1",
+    cycle: 50,
     poultryHouseId: "house-3",
     poultryType: "turkey",
     quantity: 4920,
@@ -474,33 +586,6 @@ export const mockClients: Client[] = [
     phone: "04 74 56 78 90",
     address: "8 Place de la Liberté, 01000 Bourg-en-Bresse",
     totalPurchases: 68000,
-    },
-];
-
-export const mockSales: Sale[] = [
-    {
-    id: "sale-1",
-    clientId: "client-2",
-    flockId: "flock-1",
-    quantity: 5000,
-    pricePerKg: 3.2,
-    totalWeight: 9250,
-    totalAmount: 29600,
-    date: "2024-05-05",
-    invoiceNumber: "INV-2024-0042",
-    status: "paid",
-    },
-    {
-    id: "sale-2",
-    clientId: "client-1",
-    flockId: "flock-1",
-    quantity: 2000,
-    pricePerKg: 3.5,
-    totalWeight: 3700,
-    totalAmount: 12950,
-    date: "2024-05-08",
-    invoiceNumber: "INV-2024-0043",
-    status: "pending",
     },
 ];
 
@@ -683,5 +768,45 @@ export const mockWeighings: Weighing[] = [
     minWeight: 1.65,
     maxWeight: 1.90,
     stdDeviation: 0.08,
+  },
+];
+
+
+export const mockSales: Sale[] = [
+  {
+    id: "sale-1",
+    clientId: "client-2",
+    flockId: "flock-1",
+    quantity: 5000,
+    pricePerKg: 3.2,
+    totalWeight: 9250,
+    totalAmount: 29600,
+    date: "2024-05-05",
+    invoiceNumber: "INV-2024-0042",
+    status: "paid",
+  },
+  {
+    id: "sale-2",
+    clientId: "client-1",
+    flockId: "flock-1",
+    quantity: 2000,
+    pricePerKg: 3.5,
+    totalWeight: 3700,
+    totalAmount: 12950,
+    date: "2024-05-08",
+    invoiceNumber: "INV-2024-0043",
+    status: "pending",
+  },
+    {
+    id: "sale-3",
+    clientId: "client-3",
+    flockId: "flock-1",
+    quantity: 5000,
+    pricePerKg: 3.2,
+    totalWeight: 9250,
+    totalAmount: 29600,
+    date: "2024-05-05",
+    invoiceNumber: "INV-2024-0042",
+    status: "paid",
   },
 ];

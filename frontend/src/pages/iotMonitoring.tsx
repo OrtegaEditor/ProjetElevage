@@ -105,7 +105,8 @@ return (
     <Button variant="outline"><RefreshCw className="w-4 h-4 mr-2" /></Button>
     <Select options={buildingOptions} value={selectedBuilding} onChange={(e) => setSelectedBuilding(e.target.value)}className="w-64"/>
     <Button variant="primary" onClick={() => { setSelectedSensor(null); setModalOpen(true); }}>
-    <Plus className="w-5 h-5" /> Nouveau capteur</Button>
+        <Plus className="w-5 h-5" /> Nouveau capteur
+    </Button>
     <Button variant="primary"><Download className="w-5 h-5"/>Export Excel</Button>
     <Button variant="primary"><Download className="w-5 h-5"/>Export PDF</Button>
 </div>

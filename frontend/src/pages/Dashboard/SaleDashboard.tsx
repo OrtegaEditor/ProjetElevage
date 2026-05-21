@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/commo
 import { Button } from "../../components/common/button";
 import { Plus, DollarSign, TrendingUp, ShoppingCart, FileText, X } from "lucide-react";
 
+
 export function SalesDashboard() {
 const [sales, setSales] = useState(mockSales);
 const [modalOpen, setModalOpen] = useState(false);

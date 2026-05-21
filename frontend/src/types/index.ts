@@ -28,9 +28,12 @@ export interface Farm {  //Ferme d'elevages
     id: string;
     name: string;
     address: string;
-    type: PoultryType;
+    type: PoultryType[];
     description: string;
+    totalCapacity?: number;  // calculé depuis les salles, mais utile à stocker
+    managerId?: string;
     createdAt: string;
+    active :boolean;
     }
 
 export interface PoultryHouse {//Salle d'elevages
@@ -44,6 +47,14 @@ export interface PoultryHouse {//Salle d'elevages
     ventilationStatus: "auto" | "manual" | "off";// clime
     lightingStatus: "auto" | "manual" | "off"; //lumiere
     heatingStatus: "auto" | "manual" | "off";  //Chauffage
+    active?: boolean;         // salle active ou désaffectée
+    description?: string;     // notes sur la salle
+}
+
+export interface Espece{
+    id: PoultryType;
+    name :string ;
+    averageCycle : Number;
 }
 
 export interface Sensor {
@@ -72,12 +83,17 @@ export interface Alert {
     createdAt: string;
     resolvedAt?: string;
 }
-export interface Band{
+export interface Band {
     id: string;
+    name : string;
     farmId: string;
-    especeId: string;
-    quantity: number;
-    createdDate: string;
+    especeId: string;        // type de volaille
+    quantity: number;        // nombre total d'animaux à l'arrivée
+    createdDate: string;     // date d'arrivée
+    fournisseur?: string;    // d'où viennent les animaux
+    prixUnitaire?: number;   // coût d'achat par animal
+    notes?: string;
+    status: "active" | "closed"; // bande encore en cours ou terminée
 }
 export interface Flock {  //Lots de volailles
     id: string;
@@ -87,6 +103,7 @@ export interface Flock {  //Lots de volailles
     poultryHouseId: string;
     poultryType: PoultryType;
     quantity: number;
+    cycle: number;
     startDate: string;
     endDate?: string;
     status: "active"|"closed";
@@ -209,3 +226,15 @@ export interface Weighing {
     notes?: string;
 }
 
+export interface Sale {
+    id: string;
+    clientId: string;
+    flockId: string;
+    quantity: number;
+    pricePerKg: number;
+    totalWeight: number;
+    totalAmount: number;
+    date: string;
+    invoiceNumber: string;
+    status: "pending" | "paid" | "overdue";
+}
