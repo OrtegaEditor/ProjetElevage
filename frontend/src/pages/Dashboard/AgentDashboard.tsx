@@ -106,7 +106,6 @@ return (
         <button onClick={() => setOpen(false)}  className="absolute top-2 right-2 text-gray-500" >
             ✕
         </button>
-
             <TaskPlanningForm onClose={() => setOpen(false)} />
         </div>
         </div>
