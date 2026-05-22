@@ -4,12 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/commo
 import { Badge } from "../../components/common/badge";
 import { Button } from "../../components/common/button";
 import type { Alert } from "../../types/index";
-import { mockFlocks, mockAlerts, mockStock,mockTasks } from "../../data/mockData";
+import { mockFlocks, mockAlerts, mockStock, mockTasks } from "../../data/mockData";
 import FeedingForm from "../../components/forms/feedingForm";
 import EggCollectionForm from "../../components/forms/eggCollectionForm";
 import MortalityForm from "../../components/forms/mortalityForm";
 import WeighingForm from "../../components/forms/weighingForm";
-import VaccinationForm from "../../components/forms/vaccinationForm";
+import { VaccinationForm } from "../../components/forms/vaccinationForm";
 import TaskPlanningForm from "../../components/forms/TaskPlanningForm";
 
 import {
@@ -21,11 +21,10 @@ Plus,
 Calendar,
 } from "lucide-react";
 
-
 export function AgentDashboard() {
-const [selectedAlert, setSelectedAlert] = useState<Alert|null>(null);
+const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
 const activeFlocks = mockFlocks.filter((l) => l.status === "active");
-const activeAlerts = mockAlerts.filter((a) => a.status === "active" || a.status==="ignored");
+const activeAlerts = mockAlerts.filter((a) => a.status === "active" || a.status === "ignored");
 const pendingTasks = mockTasks.filter((t) => t.status === "pending");
 const criticalStock = mockStock.filter((s) => s.quantity < s.minThreshold);
 const [openEvent, setOpenEvent] = useState<"egg_collection" | "mortality" | "feeding" | "weighing" | "vaccination" | null>(null);
@@ -44,15 +43,32 @@ switch (openEvent) {
     return <MortalityForm />;
 
     case "weighing":
-    // return <WeighingForm />;
+    // CORRIGÉ : Un seul mot-clé return propre
+    return (
+        <WeighingForm
+            onCancel={() => setOpenEvent(null)}
+            onSave={(weighingData) => {
+                console.log("Statistiques de pesée reçues :", weighingData);
+                // TODO : Envoyer vers  API ou mettre à jour un état global
+                setOpenEvent(null);
+            }}
+        />
+    );
 
     case "vaccination":
-    return <VaccinationForm />;
+    return (
+        <VaccinationForm
+        open={openEvent === "vaccination"}
+        onClose={() => setOpenEvent(null)}
+        onSubmit={(data) => console.log("Sauvegarde vaccin agent :", data)}
+        />
+    );
 
     default:
     return null;
 }
 };
+
 
 
 return (

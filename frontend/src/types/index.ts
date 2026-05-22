@@ -238,3 +238,31 @@ export interface Sale {
     invoiceNumber: string;
     status: "pending" | "paid" | "overdue";
 }
+
+export interface Supplier {
+    id: string;
+    name: string;
+    email?: string;
+    phone: string;
+    address?: string;
+    company?: string;
+    suppliedCategories: (| "band"| "feed"| "vaccine"| "medication"| "equipment" | "other")[];
+    farmIds: string[];
+    notes?: string;
+    createdAt: string;
+    active: boolean;
+}
+
+export interface StockMovement {
+  id: string;
+  stockItemId: string; // Lien vers l'article
+  stockItemName: string; // Pour affichage rapide
+  type: "entry" | "exit" | "adjustment" | "transfer";
+  quantity: number;
+  unit: string;
+  date: string;
+  referenceId?: string; // ID de la salle, du lot ou du fournisseur
+  referenceName?: string; // Ex: "Salle A1", "Fournisseur Sanders"
+  operator: string;
+  comment?: string;
+}

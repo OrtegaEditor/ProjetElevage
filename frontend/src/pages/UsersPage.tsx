@@ -41,7 +41,8 @@ export default function UsersPage() {
     const [inviteOpen, setInviteOpen] = useState<Boolean>(false);
     const [selectedUsers, setSelectedUsers] = useState<Boolean>(false);
     const [modalOpen, setModalOpen] = useState(false);
-
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [editOpen, setEditOpen] = useState(false);
 
   const stats = [
     {
@@ -225,9 +226,13 @@ export default function UsersPage() {
               </div>
 
               <div className="flex gap-2">
-                <button className="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700">
+                <Button onClick={() => {
+                    setSelectedUser(user);
+                    setEditOpen(true);
+                  }}
+                className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700">
                   Modifier
-                </button>
+                    </Button>
                 <button className="flex-1 rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white">
                   Supprimer
                 </button>

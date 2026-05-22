@@ -33,7 +33,7 @@
   label: "Élevage",
   items: [
     { path: "/poultry-houses", label: "Poulaillers", icon: <Building2 className="w-5 h-5" />, roles: ["admin", "agent"] },
-    { path: "/flocks", label: "Lots de volailles", icon: <Activity className="w-5 h-5" />, roles: ["admin", "agent"] },
+    { path: "/flocks", label: "Lots de volailles", icon: <Activity className="w-5 h-5" />, roles: ["admin", "agent","veterinarian"] },
     { path: "/weighing", label: "Pesées", icon: <Scale className="w-5 h-5" />, roles: ["agent"] },
     { path: "/stock", label: "Stock", icon: <Package className="w-5 h-5" />, roles: ["admin", "agent"] },
   ],

@@ -3,31 +3,40 @@ import { Badge } from "../components/common/badge";
 import { Button } from "../components/common/button";
 import { Plus, Syringe, Calendar, AlertTriangle } from "lucide-react";
 import { mockVaccinations, mockFlocks } from "../data/mockData";
+import { VaccinationForm } from "@/components/forms/vaccinationForm";
+import { VaccinationCalendar } from "../components/specific/VaccinationCalendar";
+import { useState } from "react";
+
 
 export function VaccinationsPage() {
-const upcomingVaccinations = mockVaccinations.filter(
-(v) => v.nextDueDate && new Date(v.nextDueDate) >= new Date()
-);
+  // ─── ÉTATS DE CONTRÔLE DES MODALS AJOUTÉS ────────────────────────────
+    const [isFormOpen, setIsFormOpen] = useState(false);
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
-const getMethodLabel = (method: string) => {
-const labels: Record<string, string> = {
-drinking_water: "Eau de boisson",
-injection: "Injection",
-spray: "Pulvérisation",
-eye_drop: "Gouttes oculaires",
-};
-return labels[method] || method;
-};
+    // Filtrage des campagnes futures
+    const upcomingVaccinations = mockVaccinations.filter(
+    (v) => v.nextDueDate && new Date(v.nextDueDate) >= new Date()
+    );
 
-const getMethodBadge = (method: string) => {
-const variants: Record<string, "info" | "success" | "warning" | "default"> = {
-drinking_water: "info",
-injection: "warning",
-spray: "success",
-eye_drop: "default",
-};
-return variants[method] || "default";
-};
+    const getMethodLabel = (method: string) => {
+    const labels: Record<string, string> = {
+        drinking_water: "Eau de boisson",
+        injection: "Injection",
+        spray: "Pulvérisation",
+        eye_drop: "Gouttes oculaires",
+    };
+    return labels[method] || method;
+    };
+
+    const getMethodBadge = (method: string): "info" | "success" | "warning" | "outline" => {
+    const variants: Record<string, "info" | "success" | "warning" | "outline"> = {
+        drinking_water: "info",
+        injection: "warning",
+        spray: "success",
+        eye_drop: "outline",
+    };
+    return variants[method] || "outline";
+    };
 
 return (
 <div className="space-y-6">
@@ -41,11 +50,13 @@ return (
     </p>
 </div>
 <div className="flex gap-3">
-    <Button variant="outline">
+    {/* CONNEXION : Ouvre le planning sous forme de calendrier */}
+    <Button variant="outline" onClick={() => setIsCalendarOpen(true)}>
     <Calendar className="w-4 h-4 mr-2" />
     Calendrier
     </Button>
-    <Button>
+    {/* CONNEXION : Ouvre la pop-up de saisie d'un nouveau vaccin */}
+    <Button onClick={() => setIsFormOpen(true)}>
     <Plus className="w-4 h-4 mr-2" />
     Nouvelle vaccination
     </Button>
@@ -238,6 +249,19 @@ return (
     </div>
 </CardContent>
 </Card>
+
+{/* LIAISON EN BAS DE PAGE DES DEUX MODALS AVEC LES ETATS ASSOCIES */}
+<VaccinationForm
+  open={isFormOpen}
+  onClose={() => setIsFormOpen(false)}
+  onSubmit={(data) => console.log("Sauvegarde vaccin :", data)}
+/>
+
+<VaccinationCalendar
+  open={isCalendarOpen}
+  onClose={() => setIsCalendarOpen(false)}
+/>
+
 </div>
 );
 }
