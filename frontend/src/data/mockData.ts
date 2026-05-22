@@ -14,7 +14,9 @@ import {
     AutomationRule,
     Band,
     Event,
+    StockMovement,
     Task,
+    Supplier,
     Weighing,
     Espece
 } from "../types";
@@ -22,7 +24,7 @@ import {
 export const mockUsers: User[] = [
   {
     id: "1",
-    name: "FOSSO Marcelin",
+    name: "Takam BERTIN (Admin)",
     email: "admin@aviculture.fr",
     password : "admin123",
     role: "admin",
@@ -351,7 +353,7 @@ export const mockAlerts: Alert[] = [
 {
     id: "1",
     type: "temperature",
-    status: "active",
+    status: "resolved_auto",
     title: "Température élevée",
     message: "Température salle A au-dessus du seuil (32°C)",
     idPoultryHouse: "PH1",
@@ -377,7 +379,7 @@ export const mockAlerts: Alert[] = [
 {
     id: "3",
     type: "ammoniac",
-    status: "resolved_manual",
+    status: "active",
     title: "Taux d’ammoniac élevé",
     message: "Concentration NH3 critique détectée dans bâtiment C",
     idPoultryHouse: "PH3",
@@ -400,164 +402,213 @@ export const mockAlerts: Alert[] = [
 ];
 export const mockFlocks: Flock[] = [
     {
-    id: "flock-1",
-    name: "PL2024-03",
-    bandId : "band-1",
-    farmId: "farm-1",
-    poultryHouseId: "house-1",
-    poultryType: "broiler",
-    quantity: 9850,
-    startDate: "2024-04-01",
-    status: "active",
-    cycle: 45,
-    averageWeight: 1.85,
-    mortality: 150,
-    age: 35,
+        id: "flock-1",
+        name: "PL2026-03",
+        bandId: "band-1",
+        farmId: "farm-1",
+        poultryHouseId: "house-1",
+        poultryType: "broiler",
+        quantity: 9850,
+        startDate: "2026-04-01",
+        status: "active",
+        cycle: 45,
+        averageWeight: 1.85,
+        mortality: 150, // Mortalité normale (~1.5%)
+        age: 35,
     },
     {
-    id: "flock-2",
-    name: "PL2024-02",
-    bandId : "band-2",
-    farmId: "farm-1",
-    poultryHouseId: "house-2",
-    poultryType: "layer",
-    cycle: 45,
-    quantity: 7890,
-    startDate: "2024-01-15",
-    status: "active",
-    averageWeight: 1.65,
-    mortality: 110,
-    age: 112,
+        id: "flock-2",
+        name: "PL2026-02",
+        bandId: "band-2",
+        farmId: "farm-1",
+        poultryHouseId: "house-2",
+        poultryType: "layer",
+        cycle: 45,
+        quantity: 7890,
+        startDate: "2026-01-15",
+        status: "active",
+        averageWeight: 1.65,
+        mortality: 410, // Provoquera l'état "critical" dans le calcul (>3%)
+        age: 112,
     },
     {
-    id: "flock-3",
-    name: "PL2024-01",
-    bandId : "band-3",
-    farmId: "farm-1",
-    cycle: 50,
-    poultryHouseId: "house-3",
-    poultryType: "turkey",
-    quantity: 4920,
-    startDate: "2024-02-10",
-    status: "active",
-    averageWeight: 8.5,
-    mortality: 80,
-    age: 84,
+        id: "flock-3",
+        name: "PL2026-01",
+        bandId: "band-3",
+        farmId: "farm-1",
+        cycle: 50,
+        poultryHouseId: "house-3",
+        poultryType: "turkey",
+        quantity: 4920,
+        startDate: "2026-02-10",
+        status: "active",
+        averageWeight: 8.5,
+        mortality: 80, // Provoquera l'état "warning"
+        age: 84,
     },
+    // NOUVEAU CAS : Lot sain et terminé (permet de tester l'historique pur)
+    {
+        id: "flock-4",
+        name: "PL2025-08",
+        bandId: "band-4",
+        farmId: "farm-1",
+        cycle: 42,
+        poultryHouseId: "house-1",
+        poultryType: "duck",
+        quantity: 3000,
+        startDate: "2025-11-01",
+        status: "active",
+        averageWeight: 2.10,
+        mortality: 45,
+        age: 42,
+    }
 ];
 
 export const mockDiseases: Disease[] = [
     {
-    id: "disease-1",
-    name: "Maladie de Newcastle",
-    type: "viral",
-    symptoms: [
-        "Dépression",
-        "Détresse respiratoire",
-        "Diarrhée verdâtre",
-        "Troubles nerveux",
-        ],
-    severity: "high",
+        id: "disease-1",
+        name: "Maladie de Newcastle",
+        type: "viral",
+        symptoms: ["Dépression", "Détresse respiratoire", "Diarrhée verdâtre", "Troubles nerveux"],
+        severity: "high",
     },
     {
-    id: "disease-2",
-    name: "Bronchite infectieuse",
-    type: "viral",
-    symptoms: [
-        "Toux",
-        "Éternuements",
-        "Écoulement nasal",
-        "Chute de ponte",
-    ],
-    severity: "medium",
+        id: "disease-2",
+        name: "Bronchite infectieuse",
+        type: "viral",
+        symptoms: ["Toux", "Éternuements", "Écoulement nasal", "Chute de ponte"],
+        severity: "medium",
     },
     {
-    id: "disease-3",
-    name: "Coccidiose",
-    type: "parasitic",
-    symptoms: [
-        "Diarrhée sanguinolente",
-        "Léthargie",
-        "Perte d'appétit",
-    ],
-    severity: "medium",
+        id: "disease-3",
+        name: "Coccidiose",
+        type: "parasitic",
+        symptoms: ["Diarrhée sanguinolente", "Léthargie", "Perte d'appétit"],
+        severity: "medium",
     },
     {
-    id: "disease-4",
-    name: "Grippe aviaire",
-    type: "viral",
-    symptoms: [
-        "Mortalité élevée",
-        "Détresse respiratoire",
-        "Chute de ponte brutale",
-    ],
-    severity: "high",
-},
+        id: "disease-4",
+        name: "Grippe aviaire",
+        type: "viral",
+        symptoms: ["Mortalité élevée", "Détresse respiratoire", "Chute de ponte brutale"],
+        severity: "high",
+    },
+    // NOUVEAU CAS : Pathologie bactérienne pour enrichir le graphique
+    {
+        id: "disease-5",
+        name: "Colibacillose",
+        type: "bacterial",
+        symptoms: ["Anorexie", "Mortalité tardive", "Péricardite"],
+        severity: "medium",
+    }
 ];
 
 export const mockTreatments: Treatment[] = [
-{
-    id: "treatment-1",
-    flockId: "flock-1",
-    veterinarianId: "3",
-    diseaseId: "disease-3",
-    medication: "Amprolium 20%",
-    dosage: "125g/100L d'eau pendant 5 jours",
-    startDate: "2024-05-01",
-    animalsCount:5,
-    endDate: "2024-05-06",
-    notes: "Traitement préventif suite à détection de coccidies à l'analyse",
-},
-{
-    id: "treatment-2",
-    flockId: "flock-2",
-    veterinarianId: "3",
-    diseaseId: "disease-1",
-    medication: "Tylosine",
-    dosage: "500mg/L d'eau pendant 3 jours",
-    startDate: "2024-04-25",
-    animalsCount:5,
-    endDate: "2024-04-28",
-    notes:"Symptômes respiratoires légers, évolution favorable",
+    // CAS 1 : Traitement EN COURS (endDate est dans le futur par rapport à mai 2026)
+    {
+        id: "treatment-1",
+        flockId: "flock-1",
+        veterinarianId: "3",
+        diseaseId: "disease-3",
+        medication: "Amprolium 20%",
+        dosage: "125g/100L d'eau pendant 5 jours",
+        startDate: "2026-05-20",
+        animalsCount: 9500,
+        endDate: "2026-05-25", // Actif !
+        notes: "Traitement collectif suite à détection de coccidies à l'analyse fécale.",
     },
+    // CAS 2 : Traitement EN COURS provoquant une alerte critique (sur flock-2)
+    {
+        id: "treatment-2",
+        flockId: "flock-2",
+        veterinarianId: "3",
+        diseaseId: "disease-1",
+        medication: "Tylosine Soluble",
+        dosage: "500mg/L d'eau pendant 5 jours",
+        startDate: "2026-05-21",
+        animalsCount: 7500,
+        endDate: "2026-05-26", // Actif !
+        notes: "Forte suspicion clinique. Évolution sous surveillance stricte.",
+    },
+    // CAS 3 : NOUVEAU CAS - Traitement TERMINÉ (permet de valider qu'il n'apparaît plus en actif)
+    {
+        id: "treatment-3",
+        flockId: "flock-3",
+        veterinarianId: "3",
+        diseaseId: "disease-2",
+        medication: "Érythromycine",
+        dosage: "200mg/L d'eau pendant 3 jours",
+        startDate: "2026-04-10",
+        animalsCount: 4900,
+        endDate: "2026-04-13", // Terminé
+        notes: "Guérison complète du lot constatée.",
+    }
 ];
 
 export const mockVaccinations: Vaccination[] = [
+    // ─── CAS EN MAI 2026 (Mois en cours pour tester le visuel immédiat) ───
     {
-    id: "vacc-1",
-    flockId: "flock-1",
-    vaccine: "Newcastle + Bronchite IB",
-    diseaseId: "disease-1",
-    administrationDate: "2024-04-08",
-    nextDueDate: "2024-04-22",
-    method: "drinking_water",
-    quantity: 10000,
-    veterinarianId: "3",
-    notes: "Vaccination de masse J+7",
+        id: "vacc-1",
+        flockId: "flock-1",
+        vaccine: "Newcastle + Bronchite IB",
+        diseaseId: "disease-1",
+        administrationDate: "2026-05-02", // Début mai
+        nextDueDate: "2026-05-16",         // Rappel milieu de mai (passé)
+        method: "drinking_water",
+        quantity: 10000,
+        veterinarianId: "3",
+        notes: "Vaccination de masse J+7 effectuée en début de cycle",
     },
     {
-    id: "vacc-2",
-    flockId: "flock-2",
-    vaccine: "Gumboro",
-    diseaseId: "disease-4",
-    administrationDate: "2024-01-29",
-    nextDueDate: "2024-02-12",
-    method: "drinking_water",
-    quantity: 8000,
-    veterinarianId: "3",
+        id: "vacc-4",
+        flockId: "flock-2",
+        vaccine: "Rappel Gumboro J21",
+        diseaseId: "disease-4",
+        administrationDate: "2026-05-12",
+        nextDueDate: "2026-05-26",         // Rappel à venir (Alerte orange active)
+        method: "eye_drop",                // Test de la méthode Gouttes oculaires
+        quantity: 7890,
+        veterinarianId: "3",
+        notes: "Inoculation oculaire individuelle",
     },
     {
-    id: "vacc-3",
-    flockId: "flock-3",
-    vaccine: "Newcastle souche lentogène",
-    diseaseId: "disease-1",
-    administrationDate: "2024-02-24",
-    method: "spray",
-    quantity: 5000,
-    veterinarianId: "3",
-    notes: "Vaccination par pulvérisation J+14",
+        id: "vacc-5",
+        flockId: "flock-3",
+        vaccine: "Vaccin Choléra Aviaire",
+        diseaseId: "disease-2",
+        administrationDate: "2026-05-22", // Aujourd'hui ! (Affiche une puce verte)
+        nextDueDate: "2026-06-22",         // Test du saut de mois automatique (Juin)
+        method: "injection",               // Test de la méthode Injection
+        quantity: 4920,
+        veterinarianId: "3",
+        notes: "Injection intramusculaire par équipe vétérinaire",
     },
+
+    // ─── CAS HISTORIQUES (Pour tester le changement de mois vers le passé) ───
+    {
+        id: "vacc-2",
+        flockId: "flock-2",
+        vaccine: "Gumboro Initial",
+        diseaseId: "disease-4",
+        administrationDate: "2026-01-29",
+        nextDueDate: "2026-02-12",
+        method: "drinking_water",
+        quantity: 8000,
+        veterinarianId: "3",
+    },
+    {
+        id: "vacc-3",
+        flockId: "flock-3",
+        vaccine: "Newcastle souche lentogène",
+        diseaseId: "disease-1",
+        administrationDate: "2026-02-24",
+        method: "spray",
+        quantity: 5000,
+        veterinarianId: "3",
+        notes: "Vaccination par pulvérisation J+14 en bâtiment fermé",
+    }
 ];
+
 
 export const mockClients: Client[] = [
     {
@@ -590,52 +641,98 @@ export const mockClients: Client[] = [
 ];
 
 export const mockStock: StockItem[] = [
-    {
+  // ─── CAS 1 : ÉTAT NORMAL (quantity > minThreshold) ───────────────────
+  {
     id: "stock-1",
     name: "Aliment démarrage poulet",
     category: "feed",
     quantity: 4500,
     unit: "kg",
     minThreshold: 2000,
+    status: "normal", // Inclus pour typage, mais écrasé visuellement par getStockStatus
+    farmId: "farm-1",
+    lastRestocked: "2026-05-01",
+    expiryDate: "2026-11-01",
+  },
+  {
+    id: "stock-2",
+    name: "Vaccin New Castle (HB1)",
+    category: "vaccine",
+    quantity: 15,
+    unit: "flacons",
+    minThreshold: 10,
     status: "normal",
     farmId: "farm-1",
-    lastRestocked: "2024-05-01",
-    },
-    {
-    id: "stock-2",
+    lastRestocked: "2026-04-15",
+    expiryDate: "2026-08-20",
+  },
+
+  // ─── CAS 2 : ÉTAT BAS (quantity <= minThreshold ET > minThreshold * 0.5)
+  {
+    id: "stock-3",
     name: "Aliment croissance dinde",
     category: "feed",
-    quantity: 1800,
+    quantity: 1200, // Inférieur ou égal à 1500 (Seuil), supérieur à 750 (Seuil * 0.5)
     unit: "kg",
-    minThreshold: 1000,
+    minThreshold: 1500,
     status: "low",
     farmId: "farm-1",
-    lastRestocked: "2024-04-28",
-    },
-    {
-    id: "stock-3",
-    name: "Vaccin Newcastle",
-    category: "vaccine",
-    quantity: 8,
-    unit: "flacons (1000 doses)",
-    minThreshold: 10,
-    farmId: "farm-1",
-    status: "critical",
-    lastRestocked: "2024-03-15",
-    expiryDate: "2025-03-15",
-    },
-    {
+    lastRestocked: "2026-03-20",
+    expiryDate: "2026-09-20",
+  },
+  {
     id: "stock-4",
-    name: "Amprolium 20%",
+    name: "Vitamines croissance liquide",
     category: "medication",
-    quantity: 3,
-    unit: "kg",
-    minThreshold: 5,
-    farmId: "farm-1",
+    quantity: 6, // Inférieur ou égal à 8, supérieur à 4
+    unit: "litres",
+    minThreshold: 8,
     status: "low",
-    lastRestocked: "2024-04-10",
-    expiryDate: "2026-04-10",
-    },
+    farmId: "farm-1",
+    lastRestocked: "2026-02-10",
+    expiryDate: "2027-02-10",
+  },
+
+  // ─── CAS 3 : ÉTAT CRITIQUE (quantity <= minThreshold * 0.5) ───────────
+  // Note : Ces éléments feront apparaître l'encadré d'alerte rouge en haut
+  {
+    id: "stock-5",
+    name: "Aliment finition poules pondeuses",
+    category: "feed",
+    quantity: 800, // Inférieur ou égal à 2000 * 0.5 (1000) -> Critique !
+    unit: "kg",
+    minThreshold: 2000,
+    status: "critical",
+    farmId: "farm-1",
+    lastRestocked: "2026-01-05",
+    expiryDate: "2026-07-05",
+  },
+  {
+    id: "stock-6",
+    name: "Antibiotique Large Spectre",
+    category: "medication",
+    quantity: 1, // Inférieur ou égal à 5 * 0.5 (2.5) -> Critique !
+    unit: "boîtes",
+    minThreshold: 5,
+    status: "critical",
+    farmId: "farm-1",
+    lastRestocked: "2025-12-12",
+    expiryDate: "2026-06-12",
+  },
+
+  // ─── CAS 4 : VALEURS MANQUANTES (Vérification des tirets "-" dans le tableau)
+  {
+    id: "stock-7",
+    name: "Désinfectant surfaces élevage",
+    category: "other", // Permet de tester le cas "default" du switch category label
+    quantity: 50,
+    unit: "litres",
+    minThreshold: 20,
+    status: "normal",
+    farmId: "farm-1",
+    lastRestocked: "2025-12-12", // Affichera "-" sous Dernier réappro.
+    expiryDate: undefined,      // Affichera "-" sous Expiration
+  }
 ];
 
 export const mockAutomationRules: AutomationRule[] = [
@@ -809,4 +906,145 @@ export const mockSales: Sale[] = [
     invoiceNumber: "INV-2024-0042",
     status: "paid",
   },
+];
+
+export const mockSuppliers: Supplier[] = [
+  {
+    id: "supplier-1",
+    name: "Couvoirs du Cameroun",
+    email: "contact@couvoirs.cm",
+    phone: "677000111",
+    address: "Douala, Cameroun",
+    company: "Couvoirs du Cameroun SARL",
+    suppliedCategories: ["feed"],
+    farmIds: ["farm-1", "farm-2"],
+    createdAt: "2026-05-22",
+    active: true,
+  },
+
+  {
+    id: "supplier-2",
+    name: "Vet Pharma Afrique",
+    email: "support@vetpharma.cm",
+    phone: "699112233",
+    address: "Yaoundé, Cameroun",
+    company: "Vet Pharma Afrique",
+    suppliedCategories: ["vaccine", "medication"],
+    farmIds: ["farm-1"],
+    createdAt: "2026-05-22",
+    active: true,
+  },
+
+  {
+    id: "supplier-3",
+    name: "AgroCAM",
+    phone: "656428832",
+    suppliedCategories: ["band"],
+    farmIds: ["farm-1"],
+    createdAt: "2026-05-22",
+    active: true,
+  },
+    {
+    id: "supplier-4",
+    name: "Agro Equipements",
+    phone: "655778899",
+    suppliedCategories: ["equipment"],
+    farmIds: ["farm-2"],
+    createdAt: "2026-05-22",
+    active: true,
+  },
+];
+
+
+export const mockStockMovements: StockMovement[] = [
+  // ─── CAS 1 : LES ENTRÉES (APPROVISIONNEMENTS) ───────────────────────
+  {
+    id: "mv-1",
+    stockItemId: "stock-1",
+    stockItemName: "Aliment démarrage poulet",
+    type: "entry",
+    quantity: 5000,
+    unit: "kg",
+    date: "2026-05-18T08:30:00Z",
+    referenceName: "Fournisseur Sanders Africa",
+    operator: "Takam BERTIN (Admin)", // Corrigé
+    comment: "Livraison mensuelle par camion - Bon N°4402",
+  },
+  {
+    id: "mv-2",
+    stockItemId: "stock-2",
+    stockItemName: "Vaccin New Castle (HB1)",
+    type: "entry",
+    quantity: 20,
+    unit: "flacons",
+    date: "2026-05-19T11:15:00Z",
+    referenceName: "Centrale Vétérinaire de l'Ouest",
+    operator:"Takam BERTIN (Admin)",// Corrigé
+    comment: "Respect de la chaîne du froid vérifié à la réception",
+  },
+
+  // ─── CAS 2 : LES SORTIES (CONSOMMATION PAR LES SALLES / LOTS) ───────
+  {
+    id: "mv-3",
+    stockItemId: "stock-1",
+    stockItemName: "Aliment démarrage poulet",
+    type: "exit",
+    quantity: 250,
+    unit: "kg",
+    date: "2026-05-20T06:00:00Z",
+    referenceId: "room-a1",
+    referenceName: "Salle A1",
+    operator: "Tagne Pierre (Agent)", // Corrigé
+    comment: "Rationnement du matin - Lot #04 (Poussins)",
+  },
+  {
+    id: "mv-4",
+    stockItemId: "stock-1",
+    stockItemName: "Aliment démarrage poulet",
+    type: "exit",
+    quantity: 250,
+    unit: "kg",
+    date: "2026-05-20T16:30:00Z",
+    referenceId: "room-a1",
+    referenceName: "Salle A1",
+    operator: "Tagne Pierre (Agent)", // Corrigé
+    comment: "Rationnement du soir - Lot #04 (Poussins)",
+  },
+  {
+    id: "mv-5",
+    stockItemId: "stock-6",
+    stockItemName: "Antibiotique Large Spectre",
+    type: "exit",
+    quantity: 2,
+    unit: "boîtes",
+    date: "2026-05-21T09:00:00Z",
+    referenceId: "room-b2",
+    referenceName: "Salle B2 (Dindes)",
+    operator: "Tagne Pierre (Agent)", // Corrigé
+    comment: "Traitement collectif préventif (Symptômes respiratoires légers)",
+  },
+
+  // ─── CAS 3 : LES AJUSTEMENTS (PERTES, CORRECTIONS D'INVENTAIRE) ────
+  {
+    id: "mv-6",
+    stockItemId: "stock-5",
+    stockItemName: "Aliment finition poules pondeuses",
+    type: "adjustment",
+    quantity: -25,
+    unit: "kg",
+    date: "2026-05-21T14:00:00Z",
+    operator: "Takam BERTIN (Admin)", 
+    comment: "Sac déchiré par des rongeurs dans le magasin secondaire",
+  },
+  {
+    id: "mv-7",
+    stockItemId: "stock-3",
+    stockItemName: "Aliment croissance dinde",
+    type: "adjustment",
+    quantity: 12,
+    unit: "kg",
+    date: "2026-05-22T10:00:00Z",
+    operator: "Tagne Pierre (Agent)", // Corrigé
+    comment: "Régularisation après inventaire physique de fin de semaine",
+  }
 ];

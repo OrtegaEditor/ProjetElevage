@@ -9,13 +9,15 @@ import { Select } from "../../components/common/select";
 
 interface SensorFormModalProps {
 sensor?: Sensor | null;
+open : boolean;
 onClose: () => void;
 onSave: (sensor: Sensor) => void;
 }
 
 const sensorTypes = ["temperature", "light", "ammoniac"];
 
-export function SensorFormModal({ sensor, onClose, onSave }: SensorFormModalProps) {
+export function SensorFormModal({ sensor,open, onClose, onSave }: SensorFormModalProps) {
+if (!open) return null;
 const [form, setForm] = useState({
 name: "",
 type: "temperature",

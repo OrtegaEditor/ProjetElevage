@@ -7,12 +7,13 @@ import { useState } from "react";
 import { Flock, Sensor } from "../types";
 import { FlocksForm } from "../components/forms/FlocksForm";
 import { SensorFormModal } from "../components/forms/SensorFormModal";
+import { useNavigate } from "react-router-dom";
 
 
 
 
 export function Flockspage() {
-
+const navigate = useNavigate();
 const [isSensorModalOpen, setSensorModalOpen] = useState(false);
 const [flocks, setFlocks] = useState<Flock[]>(mockFlocks);
 const [modalOpen, setModalOpen] = useState(false);
@@ -211,7 +212,7 @@ return (
             </div>
 
             <div className="flex gap-2">
-            <Button size="sm" variant="primary">
+            <Button size="sm" variant="primary" onClick={() => navigate(`/flocks/${flock.id}`)} >
                 Voir détails
             </Button>
             <Button size="sm" variant="outline">
@@ -257,6 +258,7 @@ return (
         </button>
         {/* ton formulaire existant */}
         <SensorFormModal
+            open={isSensorModalOpen}
             onSave={() => setSensorModalOpen(false)}
             onClose={() => setSensorModalOpen(false)}
         />

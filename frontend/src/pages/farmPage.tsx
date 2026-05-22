@@ -8,6 +8,8 @@ import { Farm, PoultryHouse, Flock } from "../types";
 import { FarmForm } from "../components/forms/farmForm";
 import { useNavigate } from "react-router-dom";
 
+
+
 export function FarmPage() {
   const [farms, setFarms] = useState(mockFarms);
   const navigate = useNavigate();
@@ -44,6 +46,10 @@ export function FarmPage() {
     return ((occupancy / capacity) * 100).toFixed(1);
   };
 
+  const handleEditFarm = (farm: Farm) => {
+    setSelectedFarm(farm);
+    setOpen(true);
+};
   return (
     <div className="space-y-6">
       {/* HEADER */}
@@ -65,7 +71,7 @@ export function FarmPage() {
             <Button onClick={() => setOpen(false)}  className="absolute top-2 right-2 text-white" >
                 ✕
             </Button>
-                <FarmForm onClose={() => setOpen(false)} />
+                <FarmForm farm={selectedFarm} onClose={() => { setOpen(false); setSelectedFarm(null); }} />
             </div>
             </div>
         )}
@@ -172,8 +178,8 @@ export function FarmPage() {
                     <Eye className="w-4 h-4 mr-2" />
                     Parcourir
                   </Button>
-                  <Button   className="p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors">
-                    <Pencil className="w-4 h-4 text-blue-600" />
+                  <Button onClick={() => { setSelectedFarm(farm); setOpen(true); }} className="p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors">
+                      <Pencil className="w-4 h-4 text-blue-600" />
                   </Button>
                   <Button className="p-2 border bg-white  border-gray-300 rounded-lg hover:bg-red-50 transition-colors">
                     <Trash2 className="w-4 h-4 text-red-600" />
@@ -187,3 +193,4 @@ export function FarmPage() {
     </div>
   );
 }
+

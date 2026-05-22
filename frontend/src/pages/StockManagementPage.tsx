@@ -6,6 +6,9 @@ import { Badge } from "../components/common/badge";
 import { Button } from "../components/common/button";
 import { mockStock } from "../data/mockData";
 import { StockItem } from "../types";
+import { StockMovementsModal } from "@/components/specific/StockMovementsModal";
+import { useNavigate } from "react-router-dom"; // Nettoyé : Navigate (inutilisé) supprimé
+import { RestockingForm } from "@/components/forms/RestockingForm";
 
 const getCategoryLabel = (category: string) => {
 switch (category) {
@@ -39,10 +42,20 @@ switch (status) {
 };
 
 export function StockManagementPage() {
-const [stock, setStock] = useState(mockStock);
+  const [movementsModalOpen, setMovementsModalOpen] = useState(false);
+  const [stock, setStock] = useState(mockStock);
+  
+  // État simple restauré pour la Pop-up
+  const [isRestockOpen, setIsRestockOpen] = useState(false);
+  
+  // Nouvel état nécessaire pour faire fonctionner le filtrage par type d'article
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
 
-const criticalItems = stock.filter(s => getStockStatus(s) === "critical");
-const lowItems = stock.filter(s => getStockStatus(s) === "low");
+  // ─── Données calculées ─────────
+  const criticalItems = stock.filter(s => getStockStatus(s) === "critical");
+  const lowItems = stock.filter(s => getStockStatus(s) === "low");
+
+  const navigate = useNavigate();
 
 return (
   <div className="space-y-6">
@@ -53,12 +66,12 @@ return (
         <p className="text-gray-600">Inventaire et approvisionnements</p>
       </div>
       <div className="flex gap-3">
-        <Button variant="outline">
+        <Button variant="outline" onClick={() => navigate("/stock/movements")}>
           <ArrowRightLeft className="w-4 h-4 mr-2" />
           Mouvements
         </Button>
-        <Button>
-          <Plus className="w-4 h-4 mr-2" />
+        <Button onClick={() => setIsRestockOpen(true)}>
+          <Plus className="w-4 h-4 mr-2"  />
           Nouveau stock
         </Button>
       </div>
@@ -88,7 +101,7 @@ return (
       />
     </div>
 
-    {/* Alerte critique */}
+        {/* Alerte critique */}
     {criticalItems.length > 0 && (
       <div className="bg-red-50 border border-red-200 rounded-xl p-5">
         <div className="flex items-center gap-2 mb-3">
@@ -106,7 +119,11 @@ return (
               </div>
               <div className="flex items-center gap-3">
                 <Badge variant="danger">Critique</Badge>
-                <Button size="sm">
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => setIsRestockOpen(true)}
+                >
                   <RefreshCw className="w-3.5 h-3.5 mr-1" />
                   Réapprovisionner
                 </Button>
@@ -116,77 +133,104 @@ return (
         </div>
       </div>
     )}
+{/* Tableau inventaire */}
+<Card>
+  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+    <CardTitle>Inventaire complet</CardTitle>
+    
+    {/* MENU DE FILTRAGE AJOUTÉ */}
+    <select
+      title="Filtrer par catégorie"
+      value={selectedCategory}
+      onChange={(e) => setSelectedCategory(e.target.value)}
+      className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2E7D32]"
+    >
+      <option value="">Toutes les catégories</option>
+      <option value="feed">Alimentation</option>
+      <option value="vaccine">Vaccins</option>
+      <option value="medication">Médicaments</option>
+      <option value="equipment">Équipements</option>
+      <option value="other">Autres</option>
+    </select>
+  </CardHeader>
+  
+  <CardContent>
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-gray-200 text-left">
+            <th className="pb-3 text-gray-600 font-medium">Article</th>
+            <th className="pb-3 text-gray-600 font-medium">Catégorie</th>
+            <th className="pb-3 text-gray-600 font-medium">Quantité</th>
+            <th className="pb-3 text-gray-600 font-medium">Seuil min.</th>
+            <th className="pb-3 text-gray-600 font-medium">État</th>
+            <th className="pb-3 text-gray-600 font-medium">Dernier réappro.</th>
+            <th className="pb-3 text-gray-600 font-medium">Expiration</th>
+            <th className="pb-3 text-gray-600 font-medium">Actions</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-100">
+          {stock
+            // FILTRAGE APPLIQUÉ ICI AVANT LE MAP
+            .filter(item => !selectedCategory || item.category === selectedCategory)
+            .map(item => {
+              const status = getStockStatus(item);
+              return (
+                <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                  <td className="py-3 font-medium text-gray-900">{item.name}</td>
+                  <td className="py-3">
+                    <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">
+                      {getCategoryLabel(item.category)}
+                    </span>
+                  </td>
+                  <td className="py-3 font-semibold text-gray-900">
+                    {item.quantity} {item.unit}
+                  </td>
+                  <td className="py-3 text-gray-500">
+                    {item.minThreshold} {item.unit}
+                  </td>
+                  <td className="py-3">
+                    <Badge variant={getStatusBadgeVariant(status)}>
+                      {getStatusLabel(status)}
+                    </Badge>
+                  </td>
+                  <td className="py-3 text-gray-500">
+                    {item.lastRestocked
+                      ? new Date(item.lastRestocked).toLocaleDateString("fr-FR")
+                      : "-"}
+                  </td>
+                  <td className="py-3 text-gray-500">
+                    {item.expiryDate
+                      ? new Date(item.expiryDate).toLocaleDateString("fr-FR")
+                      : "-"}
+                  </td>
+                  <td className="py-3">
+                    <div className="flex items-center gap-2">
+                      <Button className="p-1.5 bg-amber-50 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button className="p-1.5 bg-amber-50 text-green-600 hover:bg-green-50 rounded-lg transition-colors" onClick={() => setIsRestockOpen(true)}>
+                        <RefreshCw className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+        </tbody>
+      </table>
+    </div>
+  </CardContent>
+</Card>
+  <RestockingForm
+    open={isRestockOpen}
+    onClose={() => setIsRestockOpen(false)}
+    onSave={(newData) => { console.log(newData); }}
+  />
 
-    {/* Tableau inventaire */}
-    <Card>
-      <CardHeader>
-        <CardTitle>Inventaire complet</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-200 text-left">
-                <th className="pb-3 text-gray-600 font-medium">Article</th>
-                <th className="pb-3 text-gray-600 font-medium">Catégorie</th>
-                <th className="pb-3 text-gray-600 font-medium">Quantité</th>
-                <th className="pb-3 text-gray-600 font-medium">Seuil min.</th>
-                <th className="pb-3 text-gray-600 font-medium">État</th>
-                <th className="pb-3 text-gray-600 font-medium">Dernier réappro.</th>
-                <th className="pb-3 text-gray-600 font-medium">Expiration</th>
-                <th className="pb-3 text-gray-600 font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {stock.map(item => {
-                const status = getStockStatus(item);
-                return (
-                  <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="py-3 font-medium text-gray-900">{item.name}</td>
-                    <td className="py-3">
-                      <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">
-                        {getCategoryLabel(item.category)}
-                      </span>
-                    </td>
-                    <td className="py-3 font-semibold text-gray-900">
-                      {item.quantity} {item.unit}
-                    </td>
-                    <td className="py-3 text-gray-500">
-                      {item.minThreshold} {item.unit}
-                    </td>
-                    <td className="py-3">
-                      <Badge variant={getStatusBadgeVariant(status)}>
-                        {getStatusLabel(status)}
-                      </Badge>
-                    </td>
-                    <td className="py-3 text-gray-500">
-                      {item.lastRestocked
-                        ? new Date(item.lastRestocked).toLocaleDateString("fr-FR")
-                        : "-"}
-                    </td>
-                    <td className="py-3 text-gray-500">
-                      {item.expiryDate
-                        ? new Date(item.expiryDate).toLocaleDateString("fr-FR")
-                        : "-"}
-                    </td>
-                    <td className="py-3">
-                      <div className="flex items-center gap-2">
-                        <Button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                          <Pencil className="w-4 h-4" />
-                        </Button>
-                        <Button className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors">
-                          <RefreshCw className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </CardContent>
-    </Card>
+
   </div>
 );
 }
+
+

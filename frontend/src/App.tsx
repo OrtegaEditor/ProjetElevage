@@ -19,6 +19,9 @@ import { Flockspage } from "./pages/Flockspage";
 import { AlertsPage } from "./pages/AlertPage";
 import { TreatmentsPage } from "./pages/TreatmentsPage";
 import { VaccinationsPage } from "./pages/VaccinationsPage";
+import { StockMovementsPage } from "./pages/StockMovementsPage";
+import { HealthRegisterPage } from "./pages/HealthRegisterPage";
+import { FlockDetailPage } from "./pages/FlockDetailPage";
 // import { SalesPage } from "./pages/salesPage";
 
 
@@ -71,6 +74,9 @@ function AppRoutes() {
       <Route path="/alerts" element={<ProtectedRoute><AlertsPage /></ProtectedRoute>} />
       <Route path="/Treatments" element={<ProtectedRoute><TreatmentsPage /></ProtectedRoute>} />
       <Route path="/vaccinations" element={<ProtectedRoute><VaccinationsPage /></ProtectedRoute>} />
+      <Route path="/stock/movements" element={<StockMovementsPage />} />
+      <Route path="health-registry" element={<HealthRegisterPage />} />
+      <Route path="/flocks/:flockId" element={<FlockDetailPage />} />
       {/* <Route path="/sales" element={<ProtectedRoute><SalesPage /></ProtectedRoute>} /> */}
 
 
