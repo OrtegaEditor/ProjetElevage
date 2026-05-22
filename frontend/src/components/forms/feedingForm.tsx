@@ -12,15 +12,6 @@ return (
     ))}
     </select>
 
-    <select title="salle" className="border p-2 w-full mb-2">
-    <option value="">Sélectionner une salle</option>
-    {mockPoultryHouses.map((h) => (
-        <option key={h.id} value={h.id}>
-        {h.name}
-        </option>
-    ))}
-    </select>
-
     <input className="border p-2 w-full mb-2" placeholder="Type d'aliment" />
     <input className="border p-2 w-full mb-2" placeholder="Quantité" />
 

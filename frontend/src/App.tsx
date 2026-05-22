@@ -11,7 +11,15 @@ import { SalesDashboard } from "./pages/Dashboard/SaleDashboard";
 import { VeterinarianDashboard } from "./pages/Dashboard/VeterinarianDashboard";
 import { WeighingPage } from "./pages/weighingpage";
 import { IoTMonitoring } from "./pages/iotMonitoring";
-// import { PoultryPage } from "./pages/PoultryPage";
+import UsersPage from "./pages/UsersPage";
+import { FarmPage } from "./pages/farmPage";
+import { StockManagementPage } from "./pages/StockManagementPage";
+import { PoultryHousesPage } from "./pages/PoultryHousesPage";
+import { Flockspage } from "./pages/Flockspage";
+import { AlertsPage } from "./pages/AlertPage";
+import { TreatmentsPage } from "./pages/TreatmentsPage";
+import { VaccinationsPage } from "./pages/VaccinationsPage";
+// import { SalesPage } from "./pages/salesPage";
 
 
 
@@ -55,7 +63,15 @@ function AppRoutes() {
       <Route path="/dashboard" element={<ProtectedRoute><DashboardRouter /></ProtectedRoute>} />
       <Route path="/weighing" element={<ProtectedRoute><WeighingPage /></ProtectedRoute>} />
       <Route path="/iot-monitoring" element={<ProtectedRoute><IoTMonitoring /></ProtectedRoute>} />
-      {/* <Route path="/poultry-houses" element={<ProtectedRoute><PoultryPage /></ProtectedRoute>} /> */}
+      <Route path="/users" element={<ProtectedRoute><UsersPage /></ProtectedRoute>} />
+      <Route path="/poultry-houses" element={<ProtectedRoute><FarmPage /></ProtectedRoute>} />
+      <Route path="/stock" element={<ProtectedRoute><StockManagementPage /></ProtectedRoute>} />
+      <Route path="/poultry-houses/:farmId" element={<ProtectedRoute><PoultryHousesPage /></ProtectedRoute>} />
+      <Route path="/flocks" element={<ProtectedRoute><Flockspage /></ProtectedRoute>} />
+      <Route path="/alerts" element={<ProtectedRoute><AlertsPage /></ProtectedRoute>} />
+      <Route path="/Treatments" element={<ProtectedRoute><TreatmentsPage /></ProtectedRoute>} />
+      <Route path="/vaccinations" element={<ProtectedRoute><VaccinationsPage /></ProtectedRoute>} />
+      {/* <Route path="/sales" element={<ProtectedRoute><SalesPage /></ProtectedRoute>} /> */}
 
 
 
