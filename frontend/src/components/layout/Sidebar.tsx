@@ -44,7 +44,7 @@
   items: [
     { path: "/iot-monitoring", label: "Monitoring IoT", icon: <Thermometer className="w-5 h-5" />, roles: ["admin", "agent"] },
     { path: "/alerts", label: "Alertes", icon: <AlertTriangle className="w-5 h-5" />, roles: ["admin", "agent"] },
-    { path: "/automation", label: "Automatisation", icon: <Settings className="w-5 h-5" />, roles: ["admin"] },
+    // { path: "/automation", label: "Automatisation", icon: <Settings className="w-5 h-5" />, roles: ["admin"] },
   ],
   },
 

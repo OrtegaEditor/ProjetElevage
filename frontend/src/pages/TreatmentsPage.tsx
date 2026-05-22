@@ -3,14 +3,15 @@ import { Badge } from "../components/common/badge";
 import { Button } from "../components/common/button";
 import { Plus, Pill, Calendar, FileText } from "lucide-react";
 import { mockFlocks,mockTreatments } from "../data/mockData";
+import { useState } from "react";
+import {TreatmentForm} from "../components/forms/TreatmentForm";
 
 export function TreatmentsPage() {
-const activeTreatments = mockTreatments.filter(
-(t) => new Date(t.endDate) >= new Date()
-);
-const completedTreatments = mockTreatments.filter(
-(t) => new Date(t.endDate) < new Date()
-);
+
+    const [isNewTreatmentOpen, setIsNewTreatmentOpen] = useState(false);
+    const avgMortality = mockFlocks.reduce((sum, flock) => sum + flock.mortality, 0) / mockFlocks.length;
+    const activeTreatments = mockTreatments.filter((t) => new Date(t.endDate) >= new Date());
+    const completedTreatments = mockTreatments.filter((t) => new Date(t.endDate) < new Date());
 
 return (
 <div className="space-y-6">
@@ -28,7 +29,7 @@ return (
     <FileText className="w-4 h-4 mr-2" />
     Registre sanitaire
     </Button>
-    <Button>
+    <Button onClick={() => setIsNewTreatmentOpen(true)}>
     <Plus className="w-4 h-4 mr-2" />
     Nouveau traitement
     </Button>
@@ -237,6 +238,13 @@ return (
     </div>
 </CardContent>
 </Card>
+    <TreatmentForm
+    open={isNewTreatmentOpen}
+    onClose={() => setIsNewTreatmentOpen(false)}
+    onSubmit={(data) => {
+        console.log("Traitement créé :", data);
+        setIsNewTreatmentOpen(false);}}
+/>
 </div>
 );
 }

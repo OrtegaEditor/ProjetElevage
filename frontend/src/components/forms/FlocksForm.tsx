@@ -33,12 +33,12 @@ return (
     ))}
     </select>
 
-    <input className="border p-2 w-full mb-2" placeholder="Effectif Initial" required/>
-    <input className="border p-2 w-full mb-2" placeholder="Age (en jours)" required/>
-    <input title="Date entree" type="datetime-local" className="border p-2 w-full mb-2" value={new Date().toISOString()} required/>
-    <input className="border p-2 w-full mb-2" placeholder="Effectif Initial" required/>
-    <input className="border p-2 w-full mb-2" placeholder="Cycle (jours)" required/>
-    <input className="border p-2 w-full mb-2" placeholder="Note(Optionnel)" required />
+    <input type ="number" className="border p-2 w-full mb-2" placeholder="Effectif Initial" required/>
+    <input type="number" className="border p-2 w-full mb-2" placeholder="Age (en jours)" required/>
+    <input title="Date entree" type="datetime-local" className="border p-2 w-full mb-2" required/>
+    <input type="number" className="border p-2 w-full mb-2" placeholder="Effectif Initial" required/>
+    <input type="number"  className="border p-2 w-full mb-2" placeholder="Cycle (jours)" required/>
+    <input type="text" className="border p-2 w-full mb-2" placeholder="Note(Optionnel)" required />
 
     <Button type="submit" className="w-full" >Enregistrer</Button>
 </div>

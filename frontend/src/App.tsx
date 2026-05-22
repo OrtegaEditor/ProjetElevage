@@ -19,7 +19,7 @@ import { Flockspage } from "./pages/Flockspage";
 import { AlertsPage } from "./pages/AlertPage";
 import { TreatmentsPage } from "./pages/TreatmentsPage";
 import { VaccinationsPage } from "./pages/VaccinationsPage";
-import { SalesPage } from "./pages/salesPage";
+// import { SalesPage } from "./pages/salesPage";
 
 
 
@@ -71,7 +71,7 @@ function AppRoutes() {
       <Route path="/alerts" element={<ProtectedRoute><AlertsPage /></ProtectedRoute>} />
       <Route path="/Treatments" element={<ProtectedRoute><TreatmentsPage /></ProtectedRoute>} />
       <Route path="/vaccinations" element={<ProtectedRoute><VaccinationsPage /></ProtectedRoute>} />
-      <Route path="/sales" element={<ProtectedRoute><SalesPage /></ProtectedRoute>} />
+      {/* <Route path="/sales" element={<ProtectedRoute><SalesPage /></ProtectedRoute>} /> */}
 
 
 
