@@ -2,6 +2,16 @@ export type UserRole = "admin" | "agent" | "veterinarian" | "commercial";
 
 export type PoultryType = "broiler" | "layer" | "turkey" | "duck" | "goose";
 
+export type TaskStatus = "pending" | "completed";
+
+export type TaskType ="feeding"| "weighing"| "ventilation"| "mortality"| "egg_collection"| "cleaning"| "vaccination";
+
+export type EventType ="egg_collection"| "mortality"| "feeding"| "weighing" | "vaccination";
+
+export type AlertStatus ="active"| "resolved_auto"|"resolved_manual"| "ignored";
+
+export type StockStatus = "normal" | "low" | "critical";
+
 export interface User {
     id: string;
     name: string;
@@ -18,9 +28,12 @@ export interface Farm {  //Ferme d'elevages
     id: string;
     name: string;
     address: string;
-    type: PoultryType;
+    type: PoultryType[];
     description: string;
+    totalCapacity?: number;  // calculé depuis les salles, mais utile à stocker
+    managerId?: string;
     createdAt: string;
+    active :boolean;
     }
 
 export interface PoultryHouse {//Salle d'elevages
@@ -34,15 +47,24 @@ export interface PoultryHouse {//Salle d'elevages
     ventilationStatus: "auto" | "manual" | "off";// clime
     lightingStatus: "auto" | "manual" | "off"; //lumiere
     heatingStatus: "auto" | "manual" | "off";  //Chauffage
+    active?: boolean;         // salle active ou désaffectée
+    description?: string;     // notes sur la salle
+}
+
+export interface Espece{
+    id: PoultryType;
+    name :string ;
+    averageCycle : Number;
 }
 
 export interface Sensor {
     id: string;
     name: string;
-    type: "temperature" | "humidity" | "light";
+    type: "temperature" | "light" | "Ammoniac";
     poultryHouseId: string;
     value: number;
     unit: string;
+    calibrationOffset?: number;
     status: "online" | "offline" | "warning" | "error";
     lastUpdate: string;
     minValue?: number;
@@ -51,22 +73,27 @@ export interface Sensor {
 
 export interface Alert {
     id: string;
-    type: "critical" | "warning" | "info";
+    type: "temperature" | "light" | "ammoniac";
+    status : AlertStatus;
     title: string;
     message: string;
     idPoultryHouse: string;
     poultryHouseId?: string;
     farmId?: string;
-    resolved: boolean;
     createdAt: string;
     resolvedAt?: string;
 }
-export interface Band{
+export interface Band {
     id: string;
+    name : string;
     farmId: string;
-    especeId: string;
-    quantity: number;
-    createdDate: string;
+    especeId: string;        // type de volaille
+    quantity: number;        // nombre total d'animaux à l'arrivée
+    createdDate: string;     // date d'arrivée
+    fournisseur?: string;    // d'où viennent les animaux
+    prixUnitaire?: number;   // coût d'achat par animal
+    notes?: string;
+    status: "active" | "closed"; // bande encore en cours ou terminée
 }
 export interface Flock {  //Lots de volailles
     id: string;
@@ -76,6 +103,7 @@ export interface Flock {  //Lots de volailles
     poultryHouseId: string;
     poultryType: PoultryType;
     quantity: number;
+    cycle: number;
     startDate: string;
     endDate?: string;
     status: "active"|"closed";
@@ -118,18 +146,18 @@ export interface Vaccination {
     notes?: string;
 }
 
-export interface Sale {
-    id: string;
-    clientId: string;
-    flockId: string;
-    quantity: number;
-    pricePerKg: number;
-    totalWeight: number;
-    totalAmount: number;
-    date: string;
-    invoiceNumber: string;
-    status: "pending" | "paid" | "overdue";
-}
+const [newSaleData, setNewSaleData] = useState<Sale>({
+    id: "",
+    clientId: "",
+    flockId: "",
+    quantity: 0,
+    pricePerKg: 0,
+    totalWeight: 0,
+    totalAmount: 0,
+    date: "",
+    invoiceNumber: "",
+    status: "pending",
+  });
 
 export interface Client {
     id: string;
@@ -149,6 +177,7 @@ export interface StockItem {
     unit: string;
     minThreshold: number;
     farmId: string;
+    status: StockStatus;
     lastRestocked: string;
     expiryDate?: string;
 }
@@ -164,4 +193,48 @@ export interface AutomationRule {
     startTime: string;
     endTime: string;
 };
+}
+    export interface Task {
+    id: string;
+    type: TaskType;
+    title: string;
+    flockId: string;
+    poultryHouseId: string;
+    time: string;
+    status: TaskStatus;
+    }
+export interface Event {
+    id: string;
+    type: EventType;
+    flockId: string;
+    poultryHouseId: string;
+    createdAt: string;
+    createdBy: string;
+    notes?: string;
+}
+
+export interface Weighing {
+    id: string;
+    flockId: string;
+    agentId: string;
+    date: string;
+    weights: number[];       // poids individuels
+    averageWeight: number;   // calculé
+    minWeight: number;       // calculé
+    maxWeight: number;       // calculé
+    stdDeviation: number;    // calculé
+    notes?: string;
+}
+
+export interface Sale {
+    id: string;
+    clientId: string;
+    flockId: string;
+    quantity: number;
+    pricePerKg: number;
+    totalWeight: number;
+    totalAmount: number;
+    date: string;
+    invoiceNumber: string;
+    status: "pending" | "paid" | "overdue";
 }

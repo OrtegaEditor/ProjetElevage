@@ -43,30 +43,30 @@ const menuCategories: MenuCategory[] = [
         icon: <LayoutDashboard className="w-5 h-5" />,
         roles: ["admin", "agent", "veterinarian", "commercial"],
       },
-      // {
-      //   path: "/users",
-      //   label: "Utilisateurs",
-      //   icon: <Users className="w-5 h-5" />,
-      //   roles: ["admin"],
-      // },
+       {
+         path: "/users",
+         label: "Utilisateurs",
+        icon: <Users className="w-5 h-5" />,
+        roles: ["admin"],
+      },
     ],
   },
 
   {
     label: "Élevage",
     items: [
-      {
-        path: "/farms",
-        label: "Poulaillers",
-        icon: <Warehouse className="w-5 h-5" />,
-        roles: ["admin", "agent"],
-      },
       // {
-      //   path: "/poultry-houses",
-      //   label: "",
-      //   icon: <Building2 className="w-5 h-5" />,
+      //   path: "/farms",
+      //   label: "Fermes",
+      //   icon: <Warehouse className="w-5 h-5" />,
       //   roles: ["admin", "agent"],
       // },
+      {
+         path: "/farms",
+        label: "Poulaillers",
+        icon: <Building2 className="w-5 h-5" />,
+       roles: ["admin", "agent"],
+      },
       {
         path: "/flocks",
         label: "Lots de volailles",
@@ -122,6 +122,12 @@ const menuCategories: MenuCategory[] = [
         roles: ["veterinarian"],
       },
       {
+        path: "/veterinaire",
+        label: "VeterinaireDashboard",
+        icon: <LayoutDashboard className="w-5 h-5" />,
+        roles: ["admin", "agent", "veterinarian", "commercial"],
+      },
+      {
         path: "/vaccinations",
         label: "Vaccinations",
         icon: <Syringe className="w-5 h-5" />,
@@ -140,6 +146,12 @@ const menuCategories: MenuCategory[] = [
     label: "Commercial",
     items: [
       {
+        path: "/commercial-dashboard",
+        label: "Tableau commercial",
+        icon: <LayoutDashboard className="w-5 h-5" />,
+        roles: ["admin", "agent", "veterinarian", "commercial"],
+      },
+      {
         path: "/sales",
         label: "Ventes",
         icon: <ShoppingCart className="w-5 h-5" />,
@@ -152,10 +164,10 @@ const menuCategories: MenuCategory[] = [
         roles: ["commercial"],
       },
       {
-        path: "/analytics",
-        label: "Analytics",
+        path: "/facturisation",
+        label: "Facturation",
         icon: <ClipboardList className="w-5 h-5" />,
-        roles: ["admin"],
+        roles: ["admin", "commercial"],
       },
     ],
   },

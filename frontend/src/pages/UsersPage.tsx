@@ -1,56 +1,65 @@
+import {StatCard} from "../components/common/StatCard";
+import { Flock, User } from "../types";
+import { mockUsers } from "../data/mockData";
+import { Button } from "../components/common/button";
+import { useState } from "react";
+import { InviteCollaboratorForm } from "../components/forms/InviteCollaboratorForm";
+import { Plus } from "lucide-react";
+
+// const getStockBadgeVariant = (
+//     status: "normal" | "low" | "critical"
+// ): "success" | "warning" | "danger" | "default" => {
+//     switch (status) {
+//         case "normal":
+//             return "success";
+
+//         case "low":
+//             return "warning";
+
+//         case "critical":
+//             return "danger";
+
+//         default:
+//             return "default";
+//     }
+// };
+
+const getRoleColor = (role: string) => {
+  switch (role) {
+    case "admin": return "bg-purple-100 text-purple-700";
+    case "agent": return "bg-blue-100 text-blue-700";
+    case "veterinarian": return "bg-green-100 text-green-700";
+    case "commercial": return "bg-orange-100 text-orange-700";
+    default: return "bg-gray-100 text-gray-700";
+  }
+};
+
+
+
 export default function UsersPage() {
+  const users = mockUsers;
+    const [inviteOpen, setInviteOpen] = useState<Boolean>(false);
+    const [selectedUsers, setSelectedUsers] = useState<Boolean>(false);
+    const [modalOpen, setModalOpen] = useState(false);
+
+
   const stats = [
     {
       label: "Total utilisateurs",
       value: 4,
-      icon: "👥",
+      icon: "",
     },
     {
       label: "Administrateurs",
       value: 1,
     },
     {
-      label: "Agents terrain",
+      label: "Agents Elevages",
       value: 1,
     },
     {
       label: "Vétérinaires",
       value: 1,
-    },
-  ];
-
-  const users = [
-    {
-      initials: "J",
-      name: "Jean Dupont",
-      email: "admin@ferme.fr",
-      role: "Administrateur",
-      roleColor: "bg-green-100 text-green-700",
-      farms: "2 ferme(s)",
-    },
-    {
-      initials: "M",
-      name: "Marie Martin",
-      email: "agent@ferme.fr",
-      role: "Agent d'élevage",
-      roleColor: "bg-blue-100 text-blue-700",
-      farms: "1 ferme(s)",
-    },
-    {
-      initials: "D",
-      name: "Dr. Pierre Dubois",
-      email: "vet@ferme.fr",
-      role: "Vétérinaire",
-      roleColor: "bg-orange-100 text-orange-700",
-      farms: "2 ferme(s)",
-    },
-    {
-      initials: "S",
-      name: "Sophie Bernard",
-      email: "commercial@ferme.fr",
-      role: "Commercial",
-      roleColor: "bg-gray-100 text-gray-700",
-      farms: "2 ferme(s)",
     },
   ];
 
@@ -63,14 +72,15 @@ export default function UsersPage() {
             Gestion des utilisateurs
           </h1>
           <p className="mt-2 text-lg text-gray-500">
-            Administration des comptes et permissions (RBAC)
+            Administration des comptes et permissions
           </p>
         </div>
 
-        <button className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-green-700">
-          <span className="text-xl leading-none">+</span>
-          Nouvel utilisateur
-        </button>
+    <Button onClick={() => {setInviteOpen(true); }}
+      className="inline-flex items-center gap-2 rounded-xl px-5 py-3 font-semibold text-white shadow-sm transition" >
+      <Plus />
+      Inviter un collaborateur
+    </Button>
       </div>
 
       {/* Cartes statistiques */}
@@ -139,7 +149,7 @@ export default function UsersPage() {
             </thead>
 
             <tbody>
-              {users.map((user) => (
+              {users.map((user: User) => (
                 <tr
                   key={user.email}
                   className="border-b border-gray-100 last:border-0"
@@ -148,7 +158,7 @@ export default function UsersPage() {
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-4">
                       <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-700 font-semibold text-white">
-                        {user.initials}
+                        {user.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()}
                       </div>
                       <span className="font-medium text-gray-900">
                         {user.name}
@@ -162,7 +172,7 @@ export default function UsersPage() {
                   {/* Rôle */}
                   <td className="px-6 py-5">
                     <span
-                      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${user.roleColor}`}
+                      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold`}
                     >
                       {user.role}
                     </span>
@@ -174,12 +184,12 @@ export default function UsersPage() {
                   {/* Actions */}
                   <td className="px-6 py-5">
                     <div className="flex justify-end gap-3">
-                      <button className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                      <Button className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 ">
                         Modifier
-                      </button>
-                      <button className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600">
+                      </Button>
+                      <Button variant="danger" className="rounded-lg px-4 py-2 text-sm font-medium text-white">
                         Supprimer
-                      </button>
+                      </Button>
                     </div>
                   </td>
                 </tr>
@@ -190,14 +200,14 @@ export default function UsersPage() {
 
         {/* Version Mobile */}
         <div className="space-y-4 p-6 lg:hidden">
-          {users.map((user) => (
+          {users.map((user: User) => (
             <div
               key={user.email}
               className="rounded-2xl border border-gray-200 bg-gray-50 p-4"
             >
               <div className="mb-3 flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-700 font-semibold text-white">
-                  {user.initials}
+                  {user.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()}
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">{user.name}</p>
@@ -207,7 +217,7 @@ export default function UsersPage() {
 
               <div className="mb-3 flex items-center justify-between">
                 <span
-                  className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${user.roleColor}`}
+                  className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${user.role}`}
                 >
                   {user.role}
                 </span>
@@ -226,6 +236,25 @@ export default function UsersPage() {
           ))}
         </div>
       </section>
+              {inviteOpen && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg w-full max-w-md relative">
+
+              <button
+                className="absolute top-2 right-2"
+                onClick={() => setInviteOpen(false)}
+              >
+                ✕
+              </button>
+              <InviteCollaboratorForm
+                onClose={() => setInviteOpen(false)}
+                onSubmit={(data) => {
+                  console.log("invitation envoyée", data);
+                }}
+              />
+            </div>
+          </div>
+        )}
     </div>
   );
 }

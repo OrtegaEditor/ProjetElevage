@@ -1,15 +1,25 @@
-import React from 'react';
-import { Button } from ".././components/common/button";
+import React, { useState } from 'react';
+// import { mockStockItems } from '../data/mockData';
 
 import { Package, AlertTriangle, ArrowRightLeft, Plus } from 'lucide-react';
 
 const StockManagement = () => {
-  const stockItems = [
-    { name: 'Aliment croissance porc', category: 'Alimentation', quantity: '2450 kg', min: '1000 kg', status: 'Normal', date: '20/04/2024' },
-    { name: 'Aliment sevrage', category: 'Alimentation', quantity: '850 kg', min: '500 kg', status: 'Normal', date: '25/04/2024' },
-    { name: 'Colistine orale', category: 'Médicament', quantity: '12 flacons', min: '10 flacons', status: 'Bas', statusColor: 'bg-orange-100 text-orange-600' },
-    { name: 'Amoxicilline injectable', category: 'Médicament', quantity: '3 flacons', min: '5 flacons', status: 'Critique', statusColor: 'bg-red-100 text-red-600' },
-  ];
+  const stockItems = mockStockItems;
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
+
+  const openModal = (title: string, message: string) => {
+    setModalTitle(title);
+    setModalMessage(message);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => setModalOpen(false);
+  const handleMovements = () => openModal('Mouvements', 'Voir l’historique des mouvements de stock et les transferts entre entrepôts.');
+  const handleNewStock = () => openModal('Nouveau stock', 'Ajouter un nouvel article au stock. Le formulaire sera disponible prochainement.');
+  const handleEditItem = (itemName: string) => openModal('Modifier l’article', `Modifier ${itemName} sera disponible prochainement.`);
+  const handleReplenish = (itemName: string) => openModal('Réapprovisionnement', `Demande de réapprovisionnement envoyée pour ${itemName}.`);
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen font-sans">
@@ -20,10 +30,16 @@ const StockManagement = () => {
           <p className="text-gray-500">Inventaire et approvisionnements</p>
         </div>
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border rounded-lg text-gray-600 hover:bg-gray-50 transition">
+          <button
+            className="flex items-center gap-2 px-4 py-2 bg-white border rounded-lg text-gray-600 hover:bg-gray-50 transition"
+            onClick={handleMovements}
+          >
             <ArrowRightLeft size={18} /> Mouvements
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+          <button
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+            onClick={handleNewStock}
+          >
             <Plus size={18} /> Nouveau stock
           </button>
         </div>
@@ -49,7 +65,12 @@ const StockManagement = () => {
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">Critique</span>
-                <button className="bg-green-700 text-white px-4 py-1.5 rounded-lg text-sm">Réapprovisionner</button>
+                <button
+                  className="bg-green-700 text-white px-4 py-1.5 rounded-lg text-sm"
+                  onClick={() => handleReplenish('Amoxicilline injectable')}
+                >
+                  Réapprovisionner
+                </button>
               </div>
             </div>
           </div>
@@ -92,8 +113,18 @@ const StockManagement = () => {
                 <td className="px-6 py-4 text-gray-500">{item.date || '15/03/2024'}</td>
                 <td className="px-6 py-4">
                   <div className="flex gap-2">
-                    <button className="px-3 py-1 border rounded text-gray-600 hover:bg-gray-100">Modifier</button>
-                    <button className="px-3 py-1 bg-green-700 text-white rounded hover:bg-green-800">Réappro.</button>
+                    <button
+                    className="px-3 py-1 border rounded text-gray-600 hover:bg-gray-100"
+                    onClick={() => handleEditItem(item.name)}
+                  >
+                    Modifier
+                  </button>
+                    <button
+                      className="px-3 py-1 bg-green-700 text-white rounded hover:bg-green-800"
+                      onClick={() => handleReplenish(item.name)}
+                    >
+                      Réappro.
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -101,11 +132,41 @@ const StockManagement = () => {
           </tbody>
         </table>
       </div>
+
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl border border-gray-200">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900">{modalTitle}</h3>
+                <p className="mt-3 text-gray-600">{modalMessage}</p>
+              </div>
+              <button onClick={handleCloseModal} className="text-gray-500 hover:text-gray-900">✕</button>
+            </div>
+            <div className="mt-6 flex justify-end">
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                className="rounded-xl bg-green-700 px-5 py-3 text-sm font-semibold text-white hover:bg-green-800"
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-const StatCard = ({ title, value, icon, valueColor = "text-gray-800" }) => (
+type StatCardProps = {
+  title: string;
+  value: string | number;
+  icon?: React.ReactNode;
+  valueColor?: string;
+};
+
+const StatCard: React.FC<StatCardProps> = ({ title, value, icon, valueColor = "text-gray-800" }) => (
   <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex justify-between items-start">
     <div>
       <p className="text-gray-500 text-sm mb-1">{title}</p>

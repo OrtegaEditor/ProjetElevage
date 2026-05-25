@@ -1,25 +1,21 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useState } from "react";
+import {
+  Plus,
+  DollarSign,
+  TrendingUp,
+  ShoppingCart,
+  FileText,
+  X,
+} from "lucide-react";
 
-import { Plus, DollarSign, TrendingUp, ShoppingCart, Eye, FileText, X } from 'lucide-react';
+import "../styles/tailwind.css";
 
-type Sale = {
-  id: string;
-  lot: string;
-  date: string;
-  quantity: string;
-  unitPrice: string;
-  total: string;
-  status: string;
-  statusColor: string;
-};
+import type { Sale } from "../types";
 
-const initialSales: Sale[] = [
-  { id: 'INV-2024-042', lot: 'P2024-01', date: '28/04/2024', quantity: '395 unités', unitPrice: '1850,00 €', total: '730 750,00 €', status: 'Payé', statusColor: 'text-green-600 bg-green-50' },
-  { id: 'INV-2024-043', lot: 'P2024-03', date: '01/05/2024', quantity: '50 unités', unitPrice: '1750,00 €', total: '87 500,00 €', status: 'En attente', statusColor: 'text-orange-600 bg-orange-50' },
-];
+import { mockSales } from "../data/mockData";
 
-const SalesDashboard = () => {
-  const [allSales, setAllSales] = useState<Sale[]>(initialSales);
+const SalesPage = () => {
+  const [allSales, setAllSales] = useState<Sale[]>(mockSales);
   const [showNewSaleModal, setShowNewSaleModal] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
@@ -83,6 +79,10 @@ const SalesDashboard = () => {
 
     setShowNewSaleModal(false);
     resetNewSaleData();
+  };
+
+  const handlePrintInvoice = () => {
+    window.print();
   };
 
   return (
@@ -384,7 +384,7 @@ const SalesDashboard = () => {
                   Fermer
                 </button>
                 <button
-                  onClick={() => alert(`Facture ${selectedSale.id} affichée`)}
+                  onClick={handlePrintInvoice}
                   className="rounded-xl bg-[#2d7a43] px-5 py-3 text-sm font-semibold text-white hover:bg-[#246336]"
                 >
                   Imprimer
@@ -398,7 +398,15 @@ const SalesDashboard = () => {
   );
 };
 
-const StatCard = ({ title, value, icon, iconBg, valueColor = "text-slate-800" }) => (
+type StatCardProps = {
+  title: string;
+  value: string | number;
+  icon?: React.ReactNode;
+  iconBg?: string;
+  valueColor?: string;
+};
+
+const StatCard: React.FC<StatCardProps> = ({ title, value, icon, iconBg = 'bg-slate-100', valueColor = 'text-slate-800' }) => (
   <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex justify-between items-start">
     <div>
       <p className="text-slate-500 text-sm mb-1">{title}</p>
@@ -412,4 +420,4 @@ const StatCard = ({ title, value, icon, iconBg, valueColor = "text-slate-800" })
   </div>
 );
 
-export default SalesDashboard;
+export default SalesPage;
