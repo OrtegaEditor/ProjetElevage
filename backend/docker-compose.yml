@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: elevage_db
+    environment:
+      POSTGRES_USER: elevage_user
+      POSTGRES_PASSWORD: elevage_password
+      POSTGRES_DB: elevage_db
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - elevage_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U elevage_user -d elevage_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PgAdmin - Interface graphique PostgreSQL
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: elevage_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@elevage.com
+      PGADMIN_DEFAULT_PASSWORD: admin_password
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_ENHANCED_LOG_TAP_ENABLED: "False"
+    ports:
+      - "5050:80"
+    networks:
+      - elevage_network
+    depends_on:
+      - postgres
+
+networks:
+  elevage_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
