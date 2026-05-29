@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Float, DateTime, ForeignKey
+from sqlalchemy import Column, String, Float, DateTime, ForeignKey,func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -18,7 +18,7 @@ class StockMovement(Base):
 
     # Clé primaire composite obligatoire pour TimescaleDB
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    date = Column(DateTime, primary_key=True, nullable=False, default=datetime.utcnow)
+    date = Column(DateTime, primary_key=True, nullable=False,   server_default=func.now())
     
     # Liens et informations de l'article
     stock_item_id = Column(UUID(as_uuid=True), ForeignKey("stock_items.id"), nullable=False)

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, DateTime, ARRAY
+from sqlalchemy import Column, String, DateTime, ARRAY, func
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
 from sqlalchemy.orm import relationship
@@ -35,9 +35,9 @@ class Disease(Base):
     description = Column(String(1000), nullable=True)
     
     # Métadonnées
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+
     # Relations (optionnel)
     treatments = relationship("Treatment", back_populates="disease")
     vaccinations = relationship("Vaccination", back_populates="disease")

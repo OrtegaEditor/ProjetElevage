@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, Boolean, DateTime, ForeignKey, Float
+from sqlalchemy import Column, String, Integer, Boolean, DateTime, ForeignKey, Float, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
@@ -41,8 +41,8 @@ class Sensor(Base):
     last_update = Column(DateTime, nullable=True)
     
     # Métadonnées
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, nullable=False,  server_default=func.now())
+    updated_at = Column(DateTime, nullable=False,  server_default=func.now(), onupdate=datetime.utcnow)
     
     # Relations (optionnel)
     poultry_house = relationship("PoultryHouse", back_populates="sensors")

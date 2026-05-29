@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, Boolean, DateTime, ForeignKey
+from sqlalchemy import Column, String, Integer, Boolean, DateTime, ForeignKey, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
@@ -34,24 +34,23 @@ class PoultryHouse(Base):
     poultry_type = Column(String(50), nullable=False)  # broiler, layer, turkey, duck, goose
     
     # Automation
-    has_automation = Column(Boolean, nullable=False, default=False)
     
     # Statuts des systèmes
     ventilation_status = Column(String(20), nullable=False, default="off")  # auto, manual, off
     lighting_status = Column(String(20), nullable=False, default="off")  # auto, manual, off
     heating_status = Column(String(20), nullable=False, default="off")  # auto, manual, off
-    
     # Statut de la salle
     active = Column(Boolean, nullable=False, default=True)  # Salle active ou désaffectée
     
     # Métadonnées
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
     # Relations (optionnel)
     farm = relationship("Farm", back_populates="poultry_houses")
     sensors = relationship("Sensor", back_populates="poultry_house")
     flocks = relationship("Flock", back_populates="poultry_house")
+    alerts = relationship("Alert", back_populates="poultry_house")
+    tasks = relationship("Task", back_populates="poultry_house")
     
     def __repr__(self):
         return f"<PoultryHouse(id={self.id}, name={self.name}, farm_id={self.farm_id}, capacity={self.capacity})>"

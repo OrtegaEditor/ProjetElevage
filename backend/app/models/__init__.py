@@ -4,7 +4,6 @@ from app.core.database import Base
 
 # Importation explicite de chacun de vos 21 modèles existants
 from app.models.alert import Alert
-from app.models.automation_rule import AutomationRule
 from app.models.band import Band
 from app.models.client import Client
 from app.models.disease import Disease

@@ -12,11 +12,11 @@ class BandCreate(BaseModel):
     name: str
     quantity: int
     notes: Optional[str] = None
-    
+
     # Identifiants de liaisons
     farm_id: UUID = Field(..., alias="farmId")
     espece_id: UUID = Field(..., alias="especeId")
-    
+
     # Mappages depuis l'état du formulaire React
     fournisseur: Optional[str] = Field(None, alias="supplier")
     prix_unitaire: Optional[float] = Field(0.0, alias="prixUnitaire")

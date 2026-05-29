@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean, DateTime, ARRAY
+from sqlalchemy import Column, String, Boolean, DateTime,func
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
 from sqlalchemy.orm import relationship
@@ -20,8 +20,10 @@ class User(Base):
     # Informations de base
     name = Column(String(255), nullable=False)
     email = Column(String(255), unique=True, nullable=False, index=True)
-    password = Column(String(255), nullable=False)  # Hashé avec bcrypt
-
+    hashed_password = Column(String(255), nullable=False)
+    email_verified = Column(Boolean, default=False, nullable=False)
+    refresh_token = Column(String, nullable=True)
+    last_login = Column(DateTime, nullable=True)
     # Rôle de l'utilisateur
     role = Column(String(50), nullable=False, default="agent")  # admin, agent, veterinarian, commercial
 
@@ -33,8 +35,16 @@ class User(Base):
     active = Column(Boolean, nullable=False, default=True)
 
     # Métadonnées
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow, server_default=func.now())
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow,server_default=func.now(), onupdate=func.now())
+
+    alerts = relationship("Alert", back_populates="user", cascade="all, delete-orphan")
+    farm = relationship("Farm", back_populates="manager", cascade="all, delete-orphan")
+    tasks = relationship("Task", back_populates="user", cascade="all, delete-orphan")
+    sales = relationship("Sale", back_populates="user", cascade="all, delete-orphan")
+    treatments = relationship("Treatment", back_populates="user", cascade="all, delete-orphan")
+    vaccinations = relationship("Vaccination", back_populates="veterinarian", cascade="all, delete-orphan")
+    weighings = relationship("Weighing", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<User(id={self.id}, name={self.name}, email={self.email}, role={self.role})>"

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, Boolean, DateTime, ForeignKey, ARRAY, Float
+from sqlalchemy import Column, String, Integer, Boolean, DateTime, ForeignKey, ARRAY, Float, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -36,12 +36,15 @@ class Farm(Base):
     active = Column(Boolean, nullable=False, default=True)
     
     # Métadonnées
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
     # Relations (optionnel, pour accès facile depuis Python)
     poultry_houses = relationship("PoultryHouse", back_populates="farm")
-    manager = relationship("User")
-    
+    manager = relationship("User",back_populates="farm")
+    alerts = relationship("Alert", back_populates="farm")
+    bands = relationship("Band", back_populates="farm", cascade="all, delete-orphan")
+    flocks = relationship("Flock", back_populates="farm", cascade="all, delete-orphan")
+    stock_items = relationship("StockItem", back_populates="farm", cascade="all, delete-orphan")
+
     def __repr__(self):
         return f"<Farm(id={self.id}, name={self.name}, address={self.address}, types={self.type})>"

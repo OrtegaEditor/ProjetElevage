@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, Float, DateTime, ForeignKey, Boolean
+from sqlalchemy import Column, String, Integer, Float, DateTime, ForeignKey, Boolean, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -29,13 +29,13 @@ class Band(Base):
     notes = Column(String(1000), nullable=True)
 
     # Métadonnées
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
     # Relations
     farm = relationship("Farm", back_populates="bands")
     espece = relationship("Espece", back_populates="bands")
-    flocks = relationship("Flock", back_populates="band")
+    flocks = relationship("Flock", back_populates="band", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Band(id={self.id}, name={self.name}, status={self.status})>"

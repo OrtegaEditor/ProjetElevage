@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Float, DateTime, ForeignKey, Date, ARRAY
+from sqlalchemy import Column, String, Float, DateTime, ForeignKey, Date, ARRAY,func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime, date
@@ -20,7 +20,7 @@ class Weighing(Base):
     
     # Liens
     flock_id = Column(UUID(as_uuid=True), ForeignKey("flocks.id"), nullable=False)
-    agent_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     
     # Date de la pesée
     date = Column(Date, nullable=False)
@@ -38,15 +38,12 @@ class Weighing(Base):
     notes = Column(String(1000), nullable=True)
     
     # Métadonnées
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    updated_at = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now())
+
     # Relations (optionnel)
     flock = relationship("Flock", back_populates="weighings")
-    agent = relationship("User", back_populates="weighings")
+    user = relationship("User", back_populates="weighings")
     
     def __repr__(self):
         return f"<Weighing(id={self.id}, flock_id={self.flock_id}, date={self.date}, avg_weight={self.average_weight})>"
-    
-    
-    

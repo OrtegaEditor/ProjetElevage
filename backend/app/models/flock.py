@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, Float, DateTime, ForeignKey, Date
+from sqlalchemy import Column, String, Integer, Float, DateTime, ForeignKey, Date, func
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime, date
 from sqlalchemy.orm import relationship
@@ -18,7 +18,8 @@ class Flock(Base):
 
     # Identifiant unique
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    
+    band_id = Column(UUID(as_uuid=True), ForeignKey("bands.id"), nullable=True) #   nullable=False si un lot doit obligatoirement avoir une bande
+
     # Informations de base
     name = Column(String(255), nullable=False)  # Ex: "Lot P2024-03"
     
@@ -46,9 +47,8 @@ class Flock(Base):
     age = Column(Integer, nullable=True)  # Âge en jours
     
     # Métadonnées
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
     # Relations (optionnel)
     farm = relationship("Farm", back_populates="flocks")
     poultry_house = relationship("PoultryHouse", back_populates="flocks")
@@ -56,6 +56,8 @@ class Flock(Base):
     vaccinations = relationship("Vaccination", back_populates="flock")
     weighings = relationship("Weighing", back_populates="flock")
     events = relationship("Event", back_populates="flock")
-    
+    band = relationship("Band", back_populates="flocks")
+    sales = relationship("Sale", back_populates="flock", cascade="all, delete-orphan")
+    tasks = relationship("Task", back_populates="flock", cascade="all, delete-orphan")
     def __repr__(self):
         return f"<Flock(id={self.id}, name={self.name}, quantity={self.quantity}, status={self.status})>"

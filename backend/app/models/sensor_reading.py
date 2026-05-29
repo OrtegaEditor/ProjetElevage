@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Float, DateTime, ForeignKey
+from sqlalchemy import Column, String, Float, DateTime, ForeignKey, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -13,11 +13,12 @@ class SensorReading(Base):
     __tablename__ = "sensor_reading"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    date = Column(DateTime, primary_key=True, nullable=False, default=datetime.utcnow)
+    date = Column(DateTime, primary_key=True, nullable=False, server_default=func.now())
     
     stock_item_id = Column(UUID(as_uuid=True), ForeignKey("stock_items.id"), nullable=False)
+    sensor_id = Column(UUID(as_uuid=True), ForeignKey("sensors.id"), nullable=False)
     stock_item_name = Column(String(255), nullable=False)
-    
+    sensor_name = Column(String(255), nullable=False)
     type = Column(String(50), nullable=False)  # entry, exit, adjustment, transfer
     quantity = Column(Float, nullable=False)
     unit = Column(String(20), nullable=False)
@@ -28,7 +29,7 @@ class SensorReading(Base):
     comment = Column(String(1000), nullable=True)
 
     # Relation
-    stock_item = relationship("StockItem", back_populates="movements")
+    sensor = relationship("Sensor", back_populates="readings")
 
     def __repr__(self):
         return f"<SensorReading(id={self.id}, type={self.type}, qty={self.quantity})>"

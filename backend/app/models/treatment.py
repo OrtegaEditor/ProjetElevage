@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Date
+from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Date,func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -35,13 +35,13 @@ class Treatment(Base):
     notes = Column(String(1000), nullable=True)
     
     # Métadonnées
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    updated_at = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now())
+
     # Relations
     flock = relationship("Flock", back_populates="treatments")
     disease = relationship("Disease", back_populates="treatments")
     veterinarian = relationship("User", back_populates="treatments")
-
+    user = relationship("User", back_populates="treatments")
     def __repr__(self):
         return f"<Treatment(id={self.id}, flock_id={self.flock_id}, medication={self.medication})>"

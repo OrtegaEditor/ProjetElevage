@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean, DateTime, ARRAY
+from sqlalchemy import Column, String, Boolean, DateTime, ARRAY, func
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
 import uuid
@@ -27,8 +27,8 @@ class Supplier(Base):
     notes = Column(String(1000), nullable=True)
     active = Column(Boolean, default=True, nullable=False)
     
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, nullable=False,   server_default=func.now())
+    updated_at = Column(DateTime, nullable=False,   server_default=func.now(), onupdate=func.now())
 
     def __repr__(self):
         return f"<Supplier(id={self.id}, name={self.name})>"
