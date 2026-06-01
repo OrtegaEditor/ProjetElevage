@@ -40,11 +40,11 @@ class Farm(Base):
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     # Relations (optionnel, pour accès facile depuis Python)
     poultry_houses = relationship("PoultryHouse", back_populates="farm")
-    manager = relationship("User",back_populates="farm")
     alerts = relationship("Alert", back_populates="farm")
     bands = relationship("Band", back_populates="farm", cascade="all, delete-orphan")
     flocks = relationship("Flock", back_populates="farm", cascade="all, delete-orphan")
     stock_items = relationship("StockItem", back_populates="farm", cascade="all, delete-orphan")
-
+    manager = relationship("User", back_populates="managed_farms", foreign_keys=[manager_id])
+    members = relationship("User", secondary="farm_members", back_populates="managed_farms")
     def __repr__(self):
         return f"<Farm(id={self.id}, name={self.name}, address={self.address}, types={self.type})>"

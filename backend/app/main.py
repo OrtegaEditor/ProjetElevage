@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api.v1 import auth
+from app.api.v1 import auth,users
 
 # Créer l'application FastAPI
 app = FastAPI(
@@ -34,7 +34,9 @@ app.add_middleware(
 # ============ INCLURE LES ROUTERS ============
 
 # Ajout du préfixe global '/api/v1' requis par l'instance Axios du Frontend
+
 app.include_router(auth.router, prefix="/api/v1")
+app.include_router(users.router)
 
 # ============ ROUTES DE SANTÉ ============
 

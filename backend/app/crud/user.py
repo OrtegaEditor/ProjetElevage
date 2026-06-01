@@ -1,3 +1,5 @@
+# C:\ProjetElevage\backend\app\crud\user.py
+
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.models.user import User
@@ -119,26 +121,36 @@ def deactivate_user(db: Session, user_id: UUID) -> User:
     return user
 
 
-def update_user_profile(db: Session, user_id: UUID, name: str = None, telephone: str = None, avatar: str = None) -> User:
+def update_user_profile(db: Session, user_id: UUID, **kwargs) -> User:
     """Mettre à jour le profil d'un utilisateur"""
-    user = get_user_by_id(db, user_id)
     
+    user = get_user_by_id(db, user_id)
     if not user:
         raise ValueError("Utilisateur non trouvé")
-    
-    if name:
-        user.name = name
-    if telephone:
-        user.telephone = telephone
-    if avatar:
-        user.avatar = avatar
-    
+
+    # Ajout de "active" dans la liste blanche
+    allowed_fields = ["name", "telephone", "avatar", "role", "farm_id", "active"]
+
+    for field in allowed_fields:
+        if field in kwargs:
+            setattr(user, field, kwargs[field])
+
     db.commit()
     db.refresh(user)
-    
     return user
 
 
 def count_users(db: Session) -> int:
     """Compter le nombre d'utilisateurs"""
     return db.query(func.count(User.id)).scalar()
+
+def toggle_user_active(db: Session, user_id: UUID) -> User:
+    """Bascule l'état actif/inactif d'un utilisateur"""
+    user = get_user_by_id(db, user_id)
+    if not user:
+        raise ValueError("Utilisateur non trouvé")
+    
+    user.active = not user.active
+    db.commit()
+    db.refresh(user)
+    return user

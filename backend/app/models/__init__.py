@@ -23,7 +23,7 @@ from app.models.treatment import Treatment
 from app.models.user import User
 from app.models.vaccination import Vaccination
 from app.models.weighing import Weighing
-
+from app.models.farm_member import FarmMember
 # Exportation centralisée pour les modules externes
 __all__ = [
     "Base",
@@ -35,6 +35,7 @@ __all__ = [
     "Espece",
     "Event",
     "Farm",
+    "FarmMember",
     "Flock",
     "PoultryHouse",
     "Sale",

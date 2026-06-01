@@ -1,9 +1,12 @@
+# C:\ProjetElevage\backend\app\schemas\user.py
+
 from pydantic import BaseModel, EmailStr, Field
 from typing import List, Optional
 from uuid import UUID
 from enum import Enum
 from datetime import datetime
 from typing import Literal
+from app.schemas.farm import FarmResponse
 
 
 
@@ -12,7 +15,6 @@ from typing import Literal
 class UserRole(str, Enum):
     admin = "admin"
     agent = "agent"
-    veterinaire = "veterinaire"
     veterinarian = "veterinarian"
     commercial = "commercial"
 
@@ -28,7 +30,7 @@ class UserRegister(BaseModel):
     
     class Config:
         examples = [{
-            "name": "Herve kante",
+            "name": "Herve kouam",
             "email": "herve@example.com",
             "password": "SecurePassword123!",
             "telephone": "+33612345678"
@@ -118,6 +120,27 @@ class TeamInviteSchema(BaseModel):
     email: EmailStr
     telephone: str
     role: Literal["agent", "veterinarian", "commercial"]
+    farm_id: UUID
+
+    class Config:
+        from_attributes = True
+
+class UpdateUserRequest(BaseModel):
+    name: Optional[str] = None
+    telephone: Optional[str] = None
+    avatar: Optional[str] = None
+    role: Optional[UserRole] = None
+    active: Optional[bool] = None
+    
+
+class UserProfileResponse(BaseModel):
+    id: UUID
+    name: str
+    email: str
+    telephone: str
+    role: str
+    active: bool
+    farms: List[FarmResponse] = [] # Liste d'objets complets
 
     class Config:
         from_attributes = True
