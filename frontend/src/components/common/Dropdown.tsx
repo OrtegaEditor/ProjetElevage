@@ -47,16 +47,23 @@ setIsOpen(false);
 
 return (
 <div className="relative" ref={dropdownRef}>
-    {/* Trigger Button */}
-    <button
+   {/* Trigger Container */}
+    <div
     onClick={() => setIsOpen(!isOpen)}
     className={cn(
-        "flex items-center justify-center transition-all",
+        "flex items-center justify-center transition-all cursor-pointer",
         className
     )}
+    role="button"
+    tabIndex={0}
+    onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+            setIsOpen(!isOpen);
+        }
+    }}
     >
     {trigger}
-    </button>
+    </div>
 
     {/* Dropdown Menu */}
     {isOpen && (

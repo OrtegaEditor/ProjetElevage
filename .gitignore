@@ -1,1 +1,39 @@
+# === Environnements Virtuels ===
+venv/
+.venv/
+env/
+ENV/
+Active.custom.yaml
+InActive.custom.yaml
+
+# === Caches Python et Compilations ===
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+htmlcov/
+.toast/
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# === Fichiers de Configuration Sensibles (Contiennent vos mots de passe DB) ===
 .env
+.env.*
+!.env.example
+
+# === Outils de Développement et IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# === Logs et Fichiers Temporaires ===
+*.log
+pip-log.txt
+pip-delete-this-directory.txt
