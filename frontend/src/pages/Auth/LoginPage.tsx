@@ -1,27 +1,36 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { Input } from "../../components/common/input";
 import { Button } from "../../components/common/button";
-import { Leaf, Mail, Lock } from "lucide-react";
 import { toast } from "sonner";
+import { Leaf, Mail, Lock } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export function LoginPage() {
 const [email, setEmail] = useState("");
 const [password, setPassword] = useState("");
-const { login } = useAuth();
 const navigate = useNavigate();
+const { login, isAuthenticated } = useAuth();
 
-const handleSubmit = (e: React.FormEvent) => {
-e.preventDefault();
-const success = login(email, password);
-if (success) {
-toast.success("Connexion réussie");
-navigate("/dashboard");
-} else {
-toast.error("Email ou mot de passe incorrect");
-}
+// Dès que l'utilisateur est authentifié avec succès, on le propulse sur le dashboard
+useEffect(() => {
+    if (isAuthenticated) {
+    navigate("/dashboard");
+  }
+}, [isAuthenticated, navigate]);
+
+const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const success = await login(email, password);
+    if (success) {
+        toast.success("Connexion réussie");
+    } else {
+        toast.error("Email ou mot de passe incorrect");
+    }
 };
+
+
 
 return (
 <div className="min-h-screen bg-[#e9edf4] flex items-center justify-center p-4">
@@ -85,6 +94,15 @@ return (
 <Button type="submit" className="w-full" size="lg">
     Se connecter
 </Button>
+        <p className="text-sm text-center">
+            Vous n'avez pas de compte ?{" "}
+            <Link
+            to="/register"
+            className="text-[#2E7D32] font-medium hover:underline"
+            >
+            S'inscrire
+            </Link>
+        </p>
 </form>
 </div>
 </div>

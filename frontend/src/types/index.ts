@@ -21,7 +21,7 @@ export interface User {
     avatar?: string;
     telephone: string;
     active: boolean;
-    farms: string[];
+    farmId: string[];
 }
 
 export interface Farm {  //Ferme d'elevages
@@ -226,18 +226,18 @@ export interface Weighing {
     notes?: string;
 }
 
-export interface Sale {
-    id: string;
-    clientId: string;
-    flockId: string;
-    quantity: number;
-    pricePerKg: number;
-    totalWeight: number;
-    totalAmount: number;
-    date: string;
-    invoiceNumber: string;
-    status: "pending" | "paid" | "overdue";
-}
+// export interface Sale {
+//     id: string;
+//     clientId: string;
+//     flockId: string;
+//     quantity: number;
+//     pricePerKg: number;
+//     totalWeight: number;
+//     totalAmount: number;
+//     date: string;
+//     invoiceNumber: string;
+//     status: "pending" | "paid" | "overdue";
+// }
 
 export interface Supplier {
     id: string;

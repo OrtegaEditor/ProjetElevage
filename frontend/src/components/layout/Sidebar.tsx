@@ -34,7 +34,7 @@
   items: [
     { path: "/poultry-houses", label: "Poulaillers", icon: <Building2 className="w-5 h-5" />, roles: ["admin", "agent"] },
     { path: "/flocks", label: "Lots de volailles", icon: <Activity className="w-5 h-5" />, roles: ["admin", "agent","veterinarian"] },
-    { path: "/weighing", label: "Pesées", icon: <Scale className="w-5 h-5" />, roles: ["agent"] },
+    { path: "/weighing", label: "Pesées", icon: <Scale className="w-5 h-5" />, roles: ["agent","admin"] },
     { path: "/stock", label: "Stock", icon: <Package className="w-5 h-5" />, roles: ["admin", "agent"] },
   ],
   },
@@ -51,9 +51,9 @@
   {
   label: "Santé",
   items: [
-    { path: "/treatments", label: "Traitements", icon: <Pill className="w-5 h-5" />, roles: ["veterinarian"] },
-    { path: "/vaccinations", label: "Vaccinations", icon: <Syringe className="w-5 h-5" />, roles: ["veterinarian"] },
-    { path: "/health-registry", label: "Registre sanitaire", icon: <Stethoscope className="w-5 h-5" />, roles: ["veterinarian"] },
+    { path: "/treatments", label: "Traitements", icon: <Pill className="w-5 h-5" />, roles: ["veterinarian","admin"] },
+    { path: "/vaccinations", label: "Vaccinations", icon: <Syringe className="w-5 h-5" />, roles: ["veterinarian","admin"] },
+    { path: "/health-registry", label: "Registre sanitaire", icon: <Stethoscope className="w-5 h-5" />, roles: ["veterinarian","admin"] },
   ],
   },
 
@@ -61,8 +61,8 @@
   label: "Commercial",
   items: [
     { path: "/sales", label: "Ventes", icon: <ShoppingCart className="w-5 h-5" />, roles: ["commercial", "admin"] },
-    { path: "/clients", label: "Clients", icon: <UserCog className="w-5 h-5" />, roles: ["commercial"] },
-    { path: "/analytics", label: "Analytics", icon: <ClipboardList className="w-5 h-5" />, roles: ["admin"] },
+    { path: "/clients", label: "Clients", icon: <UserCog className="w-5 h-5" />, roles: ["commercial","admin"] },
+    { path: "/analytics", label: "Analytics", icon: <ClipboardList className="w-5 h-5" />, roles: ["admin","commercial"]},
   ],
   },
   ];

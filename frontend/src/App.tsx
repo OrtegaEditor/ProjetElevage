@@ -22,9 +22,9 @@ import { VaccinationsPage } from "./pages/VaccinationsPage";
 import { StockMovementsPage } from "./pages/StockMovementsPage";
 import { HealthRegisterPage } from "./pages/HealthRegisterPage";
 import { FlockDetailPage } from "./pages/FlockDetailPage";
-// import { SalesPage } from "./pages/salesPage";
-
-
+import { RegisterPage } from "./pages/Auth/register";
+import { TestUsersPage } from "./pages/TestUsersPage";
+import { UserProfile } from "./pages/UserProfile";
 
 
 
@@ -77,6 +77,10 @@ function AppRoutes() {
       <Route path="/stock/movements" element={<StockMovementsPage />} />
       <Route path="health-registry" element={<HealthRegisterPage />} />
       <Route path="/flocks/:flockId" element={<FlockDetailPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/test-users" element={<ProtectedRoute><TestUsersPage /></ProtectedRoute>} />
+      <Route path="/profile" element={<UserProfile />} />
+
       {/* <Route path="/sales" element={<ProtectedRoute><SalesPage /></ProtectedRoute>} /> */}
 
 
@@ -88,21 +92,18 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <AuthProvider>
         <AppRoutes />
-
-        <Toaster
-          position="top-right"
+        <Toaster           position="top-right"
           toastOptions={{
             style: {
               background: "white",
               color: "#374151",
               border: "1px solid #E5E7EB",
             },
-          }}
-        />
-      </BrowserRouter>
-    </AuthProvider>
+          }}/>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }

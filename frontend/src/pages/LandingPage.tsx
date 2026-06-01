@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "../components/common/button";
+import { useNavigate } from "react-router-dom";
 import {
 Thermometer,
 Activity,
@@ -16,7 +17,7 @@ import { useState } from "react";
 
 export function LandingPage() {
 const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+const navigate = useNavigate();
 const features = [
 {
 icon: <Thermometer className="w-8 h-8" />,
