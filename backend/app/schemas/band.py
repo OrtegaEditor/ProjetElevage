@@ -3,7 +3,7 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 from uuid import UUID
-from datetime import date
+from datetime import date,datetime
 
 class BandCreate(BaseModel):
     """
@@ -25,22 +25,19 @@ class BandCreate(BaseModel):
     class Config:
         populate_by_name = True
 
-
 class BandResponse(BaseModel):
-    """
-    Structure de réponse d'une bande créée ou lue
-    """
     id: UUID
     name: str
-    farm_id: UUID = Field(..., alias="farmId")
-    espece_id: UUID = Field(..., alias="especeId")
+    farm_id: UUID
+    espece_id: UUID
     quantity: int
-    created_date: date = Field(..., alias="createdDate")
+    created_date: datetime
     fournisseur: Optional[str] = None
-    prix_unitaire: Optional[float] = Field(None, alias="prixUnitaire")
+    prix_unitaire: Optional[float] = None
     status: str
     notes: Optional[str] = None
-
+    created_at: datetime
+    updated_at: datetime
+    
     class Config:
         from_attributes = True
-        populate_by_name = True

@@ -1,43 +1,37 @@
-# app/schemas/weighing.py
-
+# backend/app/schemas/weighing.py
 from pydantic import BaseModel, Field
-from typing import List, Optional
 from uuid import UUID
-from datetime import date
+from datetime import datetime, date
+from typing import Optional, List
 
 class WeighingBase(BaseModel):
-    # Liste de nombres flottants capturés à la saisie
-    weights: List[float]
-    notes: Optional[str] = None
-    
-    # Identifiant du lot (Mappé depuis le camelCase)
-    flock_id: UUID = Field(..., alias="flockId")
-    
-    # Statistiques calculées soumises par le formulaire React
     average_weight: float = Field(..., alias="averageWeight")
-    min_weight: float = Field(..., alias="minWeight")
-    max_weight: float = Field(..., alias="maxWeight")
-    std_deviation: float = Field(..., alias="stdDeviation")
+    sample_size: int = Field(1, alias="sampleSize")
+    weights: Optional[List[float]] = None
+    min_weight: Optional[float] = Field(None, alias="minWeight")
+    max_weight: Optional[float] = Field(None, alias="maxWeight")
+    std_deviation: Optional[float] = Field(None, alias="stdDeviation")
+    notes: Optional[str] = None
 
     class Config:
         populate_by_name = True
+        from_attributes = True
 
+class WeighingCreate(BaseModel):
+    average_weight: float = Field(..., alias="averageWeight")
+    sample_size: int = Field(1, alias="sampleSize")
+    weights: Optional[List[float]] = None
 
-class WeighingCreate(WeighingBase):
-    """
-    Champs exacts envoyés à la soumission du formulaire WeighingForm
-    """
-    pass
-
+    class Config:
+        populate_by_name = True
+        from_attributes = True
 
 class WeighingResponse(WeighingBase):
-    """
-    Structure complète d'une pesée renvoyée au frontend incluant la date et l'agent
-    """
     id: UUID
+    flock_id: UUID
     date: date
-    agent_id: UUID = Field(..., alias="agentId")
+    created_at: datetime
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
-        populate_by_name = True

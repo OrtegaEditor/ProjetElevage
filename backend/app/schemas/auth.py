@@ -43,12 +43,22 @@ class UserResponse(BaseModel):
 class TokenResponse(BaseModel):
     """
     Réponse JWT envoyée au frontend
-    """
-
+    """ 
+ 
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
     user: UserResponse
 
+class RefreshTokenResponse(BaseModel):
+    """
+    Réponse spécifique pour le refresh (sans l'objet user complet)
+    """
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
 
-
+class RefreshTokenResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"

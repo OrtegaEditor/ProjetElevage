@@ -35,4 +35,5 @@ from app.schemas.treatment import TreatmentCreate, TreatmentUpdate, TreatmentRes
 from app.schemas.vaccination import VaccinationCreate, VaccinationUpdate, VaccinationResponse
 from app.schemas.weighing import WeighingCreate, WeighingResponse
 from app.schemas.user import TeamInviteSchema
+from app.schemas.mortality import MortalityCreate,MortalityResponse
 # Import des schémas

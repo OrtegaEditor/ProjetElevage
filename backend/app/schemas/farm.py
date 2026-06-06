@@ -1,10 +1,9 @@
-# app/schemas/farm.py
-
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
 from datetime import datetime
 from uuid import UUID
 from enum import Enum
+
 
 class PoultryType(str, Enum):
     broiler = "broiler"
@@ -14,48 +13,49 @@ class PoultryType(str, Enum):
     goose = "goose"
 
 
+# =========================
+# BASE
+# =========================
 class FarmBase(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
     name: str
     address: str
-    type: List[PoultryType]
+    poultry_types: List[PoultryType]
     description: str
     active: bool = True
-    
-    # Gère l'envoi en camelCase depuis le formulaire React
-    total_capacity: int = Field(..., alias="totalCapacity")
 
-    class Config:
-        # Permet de lire et d'écrire aussi bien en camelCase (frontend) qu'en snake_case (backend)
-        populate_by_name = True
+    total_capacity: int = Field(..., validation_alias="totalCapacity")
 
 
+# =========================
+# CREATE
+# =========================
 class FarmCreate(FarmBase):
-    """
-    Champs reçus à la soumission du formulaire de création d'une ferme
-    """
     pass
 
 
-class FarmUpdate(FarmBase):
-    """
-    Champs reçus pour la modification d'une ferme (tous optionnels)
-    """
+# =========================
+# UPDATE
+# =========================
+class FarmUpdate(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
     name: Optional[str] = None
     address: Optional[str] = None
-    type: Optional[List[PoultryType]] = None
+    poultry_types: Optional[List[PoultryType]] = None
     description: Optional[str] = None
-    total_capacity: Optional[int] = Field(None, alias="totalCapacity")
+    total_capacity: Optional[int] = Field(
+        None, validation_alias="totalCapacity")
     active: Optional[bool] = None
 
 
+# =========================
+# RESPONSE
+# =========================
 class FarmResponse(FarmBase):
-    """
-    Structure de la réponse renvoyée au frontend
-    """
     id: UUID
-    created_at: datetime = Field(..., alias="createdAt")
-    manager_id: Optional[UUID] = Field(None, alias="managerId")
+    created_at: datetime = Field(..., serialization_alias="createdAt")
+    manager_id: Optional[UUID] = Field(None, serialization_alias="managerId")
 
-    class Config:
-        from_attributes = True
-        populate_by_name = True
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)

@@ -12,7 +12,7 @@ class PoultryHouse(Base):
     
     Une salle appartient à une ferme
     Une salle contient plusieurs capteurs (Sensor)
-    Une salle peut contenir plusieurs lots (Flock)
+    Une salle un lot (Flock)
     """
     __tablename__ = "poultry_houses"
 
@@ -20,7 +20,7 @@ class PoultryHouse(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     
     # Informations de base
-    name = Column(String(255), nullable=False)  # Ex: "Salle A1", "Bâtiment 2"
+    name = Column(String(255), nullable=False)  # Ex: "Salle A1"
     description = Column(String(1000), nullable=True)
     
     # Lien vers la ferme
@@ -31,9 +31,11 @@ class PoultryHouse(Base):
     current_occupancy = Column(Integer, nullable=False, default=0)  # Nombre actuel
     
     # Type de volailles dans cette salle
+    
     poultry_type = Column(String(50), nullable=False)  # broiler, layer, turkey, duck, goose
     
     # Automation
+    has_automation = Column(Boolean, default=False, nullable=False)
     
     # Statuts des systèmes
     ventilation_status = Column(String(20), nullable=False, default="off")  # auto, manual, off

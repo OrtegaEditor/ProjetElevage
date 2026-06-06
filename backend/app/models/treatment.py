@@ -42,6 +42,6 @@ class Treatment(Base):
     flock = relationship("Flock", back_populates="treatments")
     disease = relationship("Disease", back_populates="treatments")
     veterinarian = relationship("User", back_populates="treatments")
-    user = relationship("User", back_populates="treatments")
+    user = relationship("User", back_populates="treatments", overlaps="veterinarian")
     def __repr__(self):
         return f"<Treatment(id={self.id}, flock_id={self.flock_id}, medication={self.medication})>"

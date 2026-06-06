@@ -4,12 +4,14 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
+from app.models.farm import Farm
 from app.schemas.user import TeamInviteSchema
 from app.schemas.auth import (
     RegisterRequest,
     LoginRequest,
     TokenResponse,
     RefreshTokenRequest,
+    RefreshTokenResponse, # Nouveau schéma nécessaire
 )
 from app.services.auth_service import (
     register_user,
@@ -21,19 +23,16 @@ from app.services.email_service import send_real_invite_email
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
-
 @router.post("/register", response_model=TokenResponse)
 def register(data: RegisterRequest, db: Session = Depends(get_db)):
     """
-    Inscription utilisateur
+    Inscription utilisateur et connexion automatique
     """
     try:
         if not data.telephone:
             raise ValueError("Téléphone requis")
 
         user = register_user(db, data)
-        print(user.id)
-
         tokens = login_user(
             db,
             LoginRequest(
@@ -41,19 +40,20 @@ def register(data: RegisterRequest, db: Session = Depends(get_db)):
                 password=data.password,
             ),
         )
-        return tokens
+        
+        # On renvoie les tokens + l'utilisateur pour satisfaire TokenResponse
+        return {
+            **tokens,
+            "user": user
+        }
     except ValueError as e:
         raise HTTPException(
             status_code=400,
             detail=str(e),
         )
 
-
 @router.post("/login", response_model=TokenResponse)
-def login(
-    data: LoginRequest,
-    db: Session = Depends(get_db),
-):
+def login(data: LoginRequest, db: Session = Depends(get_db)):
     """
     Connexion utilisateur
     """
@@ -65,53 +65,84 @@ def login(
             detail=str(e),
         )
 
-
-@router.post("/refresh", response_model=TokenResponse)
-def refresh_token(
-    data: RefreshTokenRequest,
-    db: Session = Depends(get_db),
-):
+@router.post("/refresh", response_model=RefreshTokenResponse)
+def refresh_token(data: RefreshTokenRequest, db: Session = Depends(get_db)):
     """
     Générer un nouvel access token
     """
     try:
-        return refresh_access_token(
-            db,
-            data.refresh_token,
-        )
+        # refresh_access_token doit renvoyer un dict avec access_token et refresh_token
+        return refresh_access_token(db, data.refresh_token)
     except ValueError as e:
         raise HTTPException(
             status_code=401,
             detail=str(e),
         )
-
-
 @router.post("/invite")
 def invite_user(
     data: TeamInviteSchema, 
-    background_tasks: BackgroundTasks,
+    background_tasks: BackgroundTasks, 
     db: Session = Depends(get_db), 
     current_user: User = Depends(get_current_user)
 ):
-    """
-    Inviter un membre d'équipe (Admin uniquement)
-    """
+    """Invite un collaborateur (admin uniquement)"""
+    
+    # Vérifier que l'utilisateur est admin
     if current_user.role != "admin":
-        raise HTTPException(status_code=403, detail="Seul l'administrateur peut inviter des membres.")
+        raise HTTPException(
+            status_code=403, 
+            detail="Seul un administrateur peut inviter des membres"
+        )
     
-    # Correction de l'ID de ferme et conversion explicite en chaîne
-    member, password = invite_team_member(db, data.dict(), str(data.farm_id),current_user.id)
+    # Vérifier que l'admin est bien le manager de la ferme
+    farm = db.query(Farm).filter(
+        Farm.id == data.farm_id,
+        Farm.manager_id == current_user.id
+    ).first()
     
-    # Envoi de l'email en tâche de fond
+    if not farm:
+        raise HTTPException(
+            status_code=403,
+            detail="Vous n'êtes pas le manager de cette ferme"
+        )
+    
+    # Inviter le membre
+    member, password = invite_team_member(db, data.dict(), str(data.farm_id), current_user.id)
+    
+    # Envoyer l'email en arrière-plan
     background_tasks.add_task(send_real_invite_email, member.email, password)
     
-    return {"message": "Invitation réussie et email envoyé", "email": member.email}
+    return {
+        "message": "Invitation envoyée avec succès",
+        "email": member.email,
+        "farm_name": farm.name
+    }
 
+
+
+# @router.post("/invite")
+# def (
+#     data: TeamInviteSchema, 
+#     background_tasks: BackgroundTasks,
+#     db: Session = Depends(get_db), 
+#     current_user: User = Depends(get_current_user)
+# ):
+#     """
+#     Inviter un membre d'équipe (Admin uniquement)
+#     """
+#     if current_user.role != "admin":
+#         raise HTTPException(status_code=403, detail="Seul l'administrateur peut inviter des membres.")
+    
+#     member, password = invite_team_member(db, data.dict(), str(data.farm_id), current_user.id)
+    
+#     background_tasks.add_task(send_real_invite_email, member.email, password)
+    
+#     return {"message": "Invitation réussie et email envoyé", "email": member.email}
 
 @router.get("/me")
 def get_me(current_user: User = Depends(get_current_user)):
     """
-    Récupérer les informations de l'utilisateur connecté via son token JWT
+    Récupérer les informations de l'utilisateur connecté
     """
     return {
         "id": str(current_user.id),
@@ -122,11 +153,10 @@ def get_me(current_user: User = Depends(get_current_user)):
         "avatar": current_user.avatar
     }
 
-
 @router.post("/logout")
 def logout(current_user: User = Depends(get_current_user)):
     """Se déconnecter"""
     return {
-        "message": f"A bientot {current_user.name}!",
+        "message": f"A bientôt {current_user.name}!",
         "success": True,
     }

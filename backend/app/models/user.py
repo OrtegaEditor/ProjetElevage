@@ -43,10 +43,19 @@ class User(Base):
     treatments = relationship("Treatment", back_populates="user", cascade="all, delete-orphan")
     vaccinations = relationship("Vaccination", back_populates="veterinarian", cascade="all, delete-orphan")
     weighings = relationship("Weighing", back_populates="user", cascade="all, delete-orphan")
-    managed_farms = relationship("Farm",back_populates="manager",cascade="all, delete-orphan",
-        foreign_keys="[Farm.manager_id]" # Utilise explicitement la clé manager_id présente dans Farm
+    managed_farms = relationship(
+        "Farm", 
+        secondary="farm_members", 
+        back_populates="members",
+        primaryjoin="and_(User.id == FarmMember.user_id, FarmMember.role.in_(['admin', 'manager']))"
     )
     
-    managed_farms = relationship("Farm", secondary="farm_members", back_populates="members", lazy="selectin")
+    accessible_farms = relationship(
+        "Farm", 
+        secondary="farm_members", 
+        back_populates="members",
+        viewonly=True
+    )
+    
     def __repr__(self):
         return f"<User(id={self.id}, name={self.name}, email={self.email}, role={self.role})>"

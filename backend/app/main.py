@@ -2,7 +2,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api.v1 import auth,users
+from app.api.v1 import auth, users, flocks, poultry_house, farms, agent_farms, bands
+from app.core.database import engine
+
+
 
 # Créer l'application FastAPI
 app = FastAPI(
@@ -20,12 +23,12 @@ origins = [
     "http://localhost:3333",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:5173",
-    "http://127.0.0.1:3333",  # Autorise explicitement votre port Frontend actuel
+    "http://127.0.0.1:3333",
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # Utilise la liste explicite pour contourner le bug du .env
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -33,10 +36,13 @@ app.add_middleware(
 
 # ============ INCLURE LES ROUTERS ============
 
-# Ajout du préfixe global '/api/v1' requis par l'instance Axios du Frontend
-
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(users.router)
+app.include_router(flocks.router)
+app.include_router(poultry_house.router) 
+app.include_router(bands.router)
+app.include_router(agent_farms.router)
+app.include_router(farms.router)
 
 # ============ ROUTES DE SANTÉ ============
 
@@ -48,6 +54,7 @@ def health_check():
         "app": settings.APP_NAME,
         "version": settings.APP_VERSION,
     }
+
 
 @app.get("/")
 def root():

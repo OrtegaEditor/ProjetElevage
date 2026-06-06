@@ -24,12 +24,12 @@ class Farm(Base):
     description = Column(String(1000), nullable=True)
     
     # Types de volailles (array: broiler, layer, turkey, duck, goose)
-    type = Column(ARRAY(String(50)), nullable=False)  # ["broiler", "layer"]
+    poultry_types  = Column(ARRAY(String(50)), nullable=False)  # ["broiler", "layer"]
     
     # Gestionnaire de la ferme (lien avec User)
     manager_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
     
-    # Capacité totale (calculée depuis les salles, mais stockée pour requêtes rapides)
+    # Capacité totale (calculée depuis   les salles, mais stockée pour requêtes rapides)
     total_capacity = Column(Integer, nullable=True)
     
     # Statut
@@ -44,7 +44,9 @@ class Farm(Base):
     bands = relationship("Band", back_populates="farm", cascade="all, delete-orphan")
     flocks = relationship("Flock", back_populates="farm", cascade="all, delete-orphan")
     stock_items = relationship("StockItem", back_populates="farm", cascade="all, delete-orphan")
-    manager = relationship("User", back_populates="managed_farms", foreign_keys=[manager_id])
     members = relationship("User", secondary="farm_members", back_populates="managed_farms")
     def __repr__(self):
         return f"<Farm(id={self.id}, name={self.name}, address={self.address}, types={self.type})>"
+    
+    
+    

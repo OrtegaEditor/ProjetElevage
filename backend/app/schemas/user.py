@@ -76,6 +76,7 @@ class UserResponse(BaseModel):
     active: bool
     farms: List[UUID] = []
     created_at: Optional[datetime] = None
+    
 
     class Config:
         from_attributes = True

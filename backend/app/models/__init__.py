@@ -18,12 +18,14 @@ from app.models.sensor_reading import SensorReading
 from app.models.stock_item import StockItem
 from app.models.stock_movement import StockMovement
 from app.models.supplier import Supplier
+from app.models.egg_collection import EggCollection
 from app.models.task import Task
 from app.models.treatment import Treatment
 from app.models.user import User
 from app.models.vaccination import Vaccination
 from app.models.weighing import Weighing
 from app.models.farm_member import FarmMember
+from app.models.mortality import Mortality
 # Exportation centralisée pour les modules externes
 __all__ = [
     "Base",
@@ -49,4 +51,5 @@ __all__ = [
     "User",
     "Vaccination",
     "Weighing",
+    "Mortality",
 ]
