@@ -44,10 +44,10 @@ return (
 
 <div className="text-center mb-8">
     <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-        PoultryConnect IoT
+        SYGEXA
     </h1>
     <p className="text-gray-600">
-        Plateforme de gestion d'élevage avicole connecté
+        Système de Gestion d'Exploitations Avicoles
     </p>
 </div>
 

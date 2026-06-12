@@ -1,5 +1,5 @@
 # backend/app/schemas/feeding.py
-from pydantic import BaseModel,Field
+from pydantic import BaseModel, Field
 from uuid import UUID
 from datetime import datetime
 from typing import Optional
@@ -7,6 +7,7 @@ from typing import Optional
 class FeedingBase(BaseModel):
     feed_type: str = Field(..., alias="feedType")
     quantity_kg: float = Field(..., alias="quantityKg")
+    stock_item_id: UUID = Field(..., alias="stockItemId")  # ✅ Ajouté - requis
     date: Optional[datetime] = None
 
     class Config:
@@ -24,6 +25,7 @@ class FeedingResponse(FeedingBase):
     id: UUID
     flock_id: UUID
     created_at: datetime
+    stock_item_id: UUID  
 
     class Config:
         from_attributes = True

@@ -1,5 +1,6 @@
 # app/schemas/auth.py
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr,field_validator
+from uuid import UUID
 
 class LoginRequest(BaseModel):
     """
@@ -37,7 +38,13 @@ class UserResponse(BaseModel):
     role: str
     telephone: str
     avatar :str|None
-
+    
+    @field_validator('id', mode='before')
+    @classmethod
+    def convert_uuid_to_str(cls, v):
+        if isinstance(v, UUID):
+            return str(v)
+        return v
 
 
 class TokenResponse(BaseModel):

@@ -26,9 +26,55 @@ MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 BASE_URL = "/static/avatars"
 
 
+
+@router.get("/my-accessible-farms")
+def get_my_accessible_farms(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Récupère toutes les fermes accessibles par l'utilisateur (manager + membre)"""
+    from app.models.farm_member import FarmMember
+    
+    farms_ids = set()
+    
+    # 1. Fermes où l'utilisateur est manager
+    manager_farms = db.query(Farm).filter(Farm.manager_id == current_user.id).all()
+    for farm in manager_farms:
+        farms_ids.add(farm.id)
+    
+    # 2. Fermes où l'utilisateur est membre via farm_members
+    memberships = db.query(FarmMember).filter(FarmMember.user_id == current_user.id).all()
+    for membership in memberships:
+        farms_ids.add(membership.farm_id)
+    
+    if not farms_ids:
+        return []
+    
+    farms = db.query(Farm).filter(Farm.id.in_(farms_ids)).all()
+    
+    result = []
+    for farm in farms:
+        result.append({
+            "id": farm.id,
+            "name": farm.name,
+            "address": farm.address,
+            "description": farm.description,
+            "poultry_types": farm.poultry_types or [],
+            "manager_id": farm.manager_id,
+            "total_capacity": farm.total_capacity,
+            "active": farm.active,
+            "created_at": farm.created_at,
+            "updated_at": farm.updated_at
+        })
+    
+    return result
+
+
 def get_avatar_url(filename: str, request: Request) -> str:
     """Génère l'URL complète pour l'avatar"""
     return f"{BASE_URL}/{filename}"
+
+
 
 
 @router.post("/upload-avatar")

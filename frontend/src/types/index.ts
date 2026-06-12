@@ -24,17 +24,17 @@ export interface User {
     farmId: string[];
 }
 
-export interface Farm {  //Ferme d'elevages
+export interface Farm {
     id: string;
     name: string;
     address: string;
-    type: PoultryType[];
+    poultry_types: PoultryType[];
     description: string;
-    totalCapacity?: number;  // calculé depuis les salles, mais utile à stocker
+    totalCapacity?: number;
     managerId?: string;
     createdAt: string;
-    active :boolean;
-    }
+    active: boolean;
+}
 
 export interface PoultryHouse {//Salle d'elevages
     id: string;
@@ -70,7 +70,29 @@ export interface Sensor {
     minValue?: number;
     maxValue?: number;
 }
+export interface Feeding{
+    id : string;
+    flockId: string;
+    quantity:number;
+}
+ 
+export interface EggCollecting {
+  id: string;
+  flockId: string;
+  poultryHouseId: string;
+  eggCount: number;
+  eggSize: 'small' | 'medium' | 'large';
+  notes?: string;
+  collectionDate: string;
+}
 
+export interface Mortality{
+    id : string;
+    flockId: string;
+    poutryHouseId : string;
+    quantity : number;
+    cause : string;
+}
 export interface Alert {
     id: string;
     type: "temperature" | "light" | "ammoniac";
@@ -87,7 +109,7 @@ export interface Band {
     id: string;
     name : string;
     farmId: string;
-    especeId: string;        // type de volaille
+    espece_id: string;        // type de volaille
     quantity: number;        // nombre total d'animaux à l'arrivée
     createdDate: string;     // date d'arrivée
     fournisseur?: string;    // d'où viennent les animaux
@@ -104,11 +126,14 @@ export interface Flock {  //Lots de volailles
     poultryType: PoultryType;
     quantity: number;
     cycle: number;
+    farmName: string;  
+    poultryHouseName: string;
     startDate: string;
     endDate?: string;
     status: "active"|"closed";
     averageWeight: number;
-    mortality: number;
+    mortality: Mortality[];
+    bandName?: string;
     age: number;
 }
 
@@ -169,19 +194,6 @@ export interface Client {
     totalPurchases: number;
 }
 
-export interface StockItem {
-    id: string;
-    name: string;
-    category: "feed" | "vaccine" | "medication" | "equipment" | "other";
-    quantity: number;
-    unit: string;
-    minThreshold: number;
-    farmId: string;
-    status: StockStatus;
-    lastRestocked: string;
-    expiryDate?: string;
-}
-
 export interface AutomationRule {
     id: string;
     poultryHouseId: string;
@@ -216,14 +228,16 @@ export interface Event {
 export interface Weighing {
     id: string;
     flockId: string;
-    agentId: string;
+    averageWeight: number;
+    sampleSize: number;
+    weights: number[];
+    minWeight: number;
+    maxWeight: number;
+    stdDeviation: number;
     date: string;
-    weights: number[];       // poids individuels
-    averageWeight: number;   // calculé
-    minWeight: number;       // calculé
-    maxWeight: number;       // calculé
-    stdDeviation: number;    // calculé
     notes?: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 // export interface Sale {
@@ -239,30 +253,122 @@ export interface Weighing {
 //     status: "pending" | "paid" | "overdue";
 // }
 
-export interface Supplier {
-    id: string;
-    name: string;
-    email?: string;
-    phone: string;
-    address?: string;
-    company?: string;
-    suppliedCategories: (| "band"| "feed"| "vaccine"| "medication"| "equipment" | "other")[];
-    farmIds: string[];
-    notes?: string;
-    createdAt: string;
-    active: boolean;
+// frontend/src/types/index.ts
+
+export interface StockItem {
+  id: string;
+  name: string;
+  category: "vaccine" | "medication" | "equipment" | "other";
+  quantity: number;
+  unit: string;
+  minThreshold: number;
+  feedSubType?: "starter" | "grower" | "finisher";
+  farmId: string;
+  supplierId?: string;
+  supplierName?: string;
+  status: "normal" | "low" | "critical";
+  lastRestocked: string;
+  expiryDate?: string;
+  unitPrice?: number;
+  notes?: string;
 }
 
 export interface StockMovement {
   id: string;
-  stockItemId: string; // Lien vers l'article
-  stockItemName: string; // Pour affichage rapide
+  stockItemId: string;
   type: "entry" | "exit" | "adjustment" | "transfer";
   quantity: number;
   unit: string;
   date: string;
-  referenceId?: string; // ID de la salle, du lot ou du fournisseur
-  referenceName?: string; // Ex: "Salle A1", "Fournisseur Sanders"
-  operator: string;
+  referenceId?: string;
+  referenceName?: string;
+  operatorId: string;
+  operatorName: string;
   comment?: string;
 }
+
+export interface Supplier {
+  id: string;
+  name: string;
+  email?: string;
+  phone: string;
+  address?: string;
+  company?: string;
+  supplied_categories?: string[];  
+  suppliedCategories?: string[];   
+  notes?: string;
+  active: boolean;
+  farm_ids?: string[];  
+  farmIds?: string[];   
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface FlockData {
+    id: string;
+    name: string;
+    quantity: number;
+    age: number;
+    averageWeight: number;
+    poultryHouseId: string;
+}
+    
+
+export interface WeighingData {
+  averageWeight: number;
+  sampleSize: number;
+  stdDeviation: number;
+  confidenceLevel: '5' | '10' | '15';
+}
+
+export interface QuarantineData {
+    quantity: number;
+    newFlockName: string;
+    reason: string;
+}
+
+export interface TabConfig {
+    id: 'feeding' | 'weighing' | 'mortality' | 'quarantine';
+    label: string;
+    icon: any;
+    color: string;
+}
+export interface FeedingData {
+  feedType: 'starter' | 'grower' | 'finisher';
+  quantityKg: number;
+}
+
+export interface MortalityData {
+  quantity: number;
+  cause: string;
+}
+
+export interface QuarantineData {
+  quantity: number;
+  reason: string;
+  newFlockName: string;
+}
+
+export interface FarmWithDetails {
+  id: string;
+  name: string;
+  address: string;
+  poultryHouses: any[];
+  activeFlocks: any[];
+  totalAnimals: number;
+  occupancyRate: number;
+  avgWeight: number;
+  growthData: { date: string; weight: number }[];
+}
+
+export interface RecentEvent {
+  id: string;
+  farmId: string;
+  farmName: string;
+  type: "arrival" | "treatment" | "vaccination" | "stock_entry" | "stock_exit" | "house_created";
+  title: string;
+  description: string;
+  quantity?: number;
+  date: string;
+}
+

@@ -10,6 +10,7 @@ from app.models.disease import Disease
 from app.models.espece import Espece
 from app.models.event import Event
 from app.models.farm import Farm
+from app.models.farm_supplier import FarmSupplier
 from app.models.flock import Flock
 from app.models.poultry_house import PoultryHouse
 from app.models.sale import Sale

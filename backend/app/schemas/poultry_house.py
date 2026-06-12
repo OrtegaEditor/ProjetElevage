@@ -18,34 +18,29 @@ class PoultryHouseBase(BaseModel):
     description: Optional[str] = None
     poultry_type: PoultryType = Field(..., alias="poultryType")
     has_automation: bool = Field(..., alias="hasAutomation")
-    
-    # Liens d'identifiants
     farm_id: UUID = Field(..., alias="farmId")
-    
-    # Pris en charge par le formulaire, mappé en snake_case
-    current_occupancy: int = Field(..., alias="currentOccupancy")
 
     class Config:
         populate_by_name = True
 
 
-class PoultryHouseCreate(PoultryHouseBase):
+class PoultryHouseCreate(BaseModel):
     """
     Champs reçus à la soumission du formulaire PoultryHouseForm
     """
     name: str
-    description: str | None = None
-    farm_id: UUID
+    description: Optional[str] = None
+    farm_id: UUID = Field(..., alias="farmId")
     capacity: int
-    current_occupancy: int = 0
-    poultry_type: str
-    has_automation: bool = False
+    poultry_type: str = Field(..., alias="poultryType")
+    has_automation: bool = Field(False, alias="hasAutomation")
+    current_occupancy: Optional[int] = Field(0, alias="currentOccupancy")  # ← OPTIONNEL
+
+    class Config:
+        populate_by_name = True
 
 
-class PoultryHouseUpdate(PoultryHouseBase):
-    """
-    Champs modifiables pour une salle d'élevage (tous optionnels)
-    """
+class PoultryHouseUpdate(BaseModel):
     name: Optional[str] = None
     capacity: Optional[int] = None
     description: Optional[str] = None
@@ -54,11 +49,11 @@ class PoultryHouseUpdate(PoultryHouseBase):
     farm_id: Optional[UUID] = Field(None, alias="farmId")
     current_occupancy: Optional[int] = Field(None, alias="currentOccupancy")
 
+    class Config:
+        populate_by_name = True
+
 
 class PoultryHouseResponse(PoultryHouseBase):
-    """
-    Structure complète renvoyée au frontend (inclut les status par défaut du modèle)
-    """
     id: UUID
     name: str
     description: Optional[str]

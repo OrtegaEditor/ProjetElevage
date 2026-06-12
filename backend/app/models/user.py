@@ -40,7 +40,7 @@ class User(Base):
     alerts = relationship("Alert", back_populates="user", cascade="all, delete-orphan")
     tasks = relationship("Task", back_populates="user", cascade="all, delete-orphan")
     sales = relationship("Sale", back_populates="user", cascade="all, delete-orphan")
-    treatments = relationship("Treatment", back_populates="user", cascade="all, delete-orphan")
+    treatments = relationship("Treatment", back_populates="veterinarian", cascade="all, delete-orphan")
     vaccinations = relationship("Vaccination", back_populates="veterinarian", cascade="all, delete-orphan")
     weighings = relationship("Weighing", back_populates="user", cascade="all, delete-orphan")
     managed_farms = relationship(

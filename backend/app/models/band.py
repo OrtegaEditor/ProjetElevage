@@ -29,8 +29,8 @@ class Band(Base):
     notes = Column(String(1000), nullable=True)
 
     # Métadonnées
-    created_at = Column(DateTime, server_default=func.now(), nullable=False)
-    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relations
     farm = relationship("Farm", back_populates="bands")

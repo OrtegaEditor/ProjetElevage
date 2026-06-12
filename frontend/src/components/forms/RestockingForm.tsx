@@ -1,513 +1,394 @@
-import React, { useState } from "react";
+    // frontend/src/components/forms/RestockingForm.tsx - Version améliorée
 
-import { Card, CardContent, CardHeader, CardTitle } from "../common/card";
-import { Button } from "../common/button";
-import { Input } from "../common/input";
-import { Select } from "../common/select";
+    import React, { useState, useEffect } from "react";
+    import { Button } from "../common/button";
+    import { Input } from "../common/input";
+    import { Select } from "../common/select";
+    import { Label } from "../ui/label";
+    import { Textarea } from "../ui/textarea";
+    import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    } from "../ui/dialog";
+    import { stockAPI, suppliersAPI, farmsAPI } from "../../services/api";
+    import type { StockItem, Supplier, Farm } from "../../types";
 
-import { Label } from "../ui/label";
-import { Textarea } from "../ui/textarea";
+    type Category = "feed" | "vaccine" | "medication" | "equipment" | "other";
+    type FeedSubType = "starter" | "grower" | "finisher";
 
-import type { Band, StockItem,Supplier } from "../../types";
-
-import { mockFarms,mockSuppliers } from "../../data/mockData";
-import { Dialog, DialogContent } from "../ui/dialog";
-
-type Category =
-| "flock"
-| "feed"
-| "vaccine"
-| "medication"
-| "equipment"
-| "other";
-
-interface RestockingFormProps {
+    interface RestockingFormProps {
     open: boolean;
-    onSave: (data: { type: "band" | "stock"; data: Partial<Band> | Partial<StockItem> }) => void;
+    onSave: (data: any) => void;
     onClose: () => void;
-    initialStockItem?: StockItem,
-}
+    initialStockItem?: StockItem;
+    isEditMode?: boolean;
+    }
 
-interface FormDataState {
-farmId: string;
-name: string;
-supplier: string;
-quantity: number;
-unit: string;
-minThreshold: number;
-prixUnitaire: number;
-especeId: string;
-expiryDate: string;
-notes: string;
-restockDate: string;
-}
+    export function RestockingForm({ open, onSave, onClose, initialStockItem, isEditMode }: RestockingFormProps) {
+    const [loading, setLoading] = useState(false);
+    const [farms, setFarms] = useState<Farm[]>([]);
+    const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+    const [category, setCategory] = useState<Category>("feed");
+    const [feedSubType, setFeedSubType] = useState<FeedSubType>("starter");
 
-export function RestockingForm({
-open,
-onSave,
-onClose,
-initialStockItem,
-}: RestockingFormProps) {
-const [category, setCategory] = useState<Category>("feed");
+    const [formData, setFormData] = useState({
+        name: "",
+        farmId: "",
+        supplierId: "",
+        quantity: 0,
+        unit: "",
+        minThreshold: 0,
+        unitPrice: 0,
+        expiryDate: "",
+        restockDate: new Date().toISOString().split("T")[0],
+        notes: ""
+    });
 
-const [formData, setFormData] = useState<FormDataState>({
-farmId: "",
-name: "",
-supplier: "",
-quantity: 0,
-unit: "",
-minThreshold: 0,
-prixUnitaire: 0,
-especeId: "",
-expiryDate: "",
-notes: "",
-restockDate: new Date().toISOString().split("T")[0],
-});
-
-const handleChange = (
-field: keyof FormDataState,
-value: string | number
-) => {
-setFormData((prev) => ({
-    ...prev,
-    [field]: value,
-}));
-};
-
-const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-e.preventDefault();
-
-if (category === "flock") {
-    const bandData: Partial<Band> = {
-    name: formData.name,
-    farmId: formData.farmId,
-    especeId: formData.especeId,
-    quantity: formData.quantity,
-    createdDate: formData.restockDate,
-    fournisseur: formData.supplier,
-    prixUnitaire: formData.prixUnitaire,
-    notes: formData.notes,
-    status: "active",
+    const fetchFarms = async () => {
+        try {
+        const data = await farmsAPI.getMyManagedFarms();
+        setFarms(data || []);
+        if (data && data.length > 0 && !formData.farmId) {
+            setFormData(prev => ({ ...prev, farmId: data[0].id }));
+        }
+        } catch (error) {
+        console.error("Erreur chargement fermes:", error);
+        }
     };
 
-    onSave({
-    type: "band",
-    data: bandData,
-    });
-} else {
-    const stockData: Partial<StockItem> = {
-    name: formData.name,
-    category,
-    quantity: formData.quantity,
-    unit: formData.unit,
-    minThreshold: formData.minThreshold,
-    farmId: formData.farmId,
-    lastRestocked: formData.restockDate,
-    expiryDate: formData.expiryDate || undefined,
-    status: "normal",
+    const fetchSuppliers = async () => {
+        try {
+        const data = await suppliersAPI.getAll();
+        setSuppliers(data || []);
+        } catch (error) {
+        console.error("Erreur chargement fournisseurs:", error);
+        }
     };
 
-    onSave({
-    type: "stock",
-    data: stockData,
-    });
-}
+    // Suggérer une quantité basée sur le seuil minimum
+    const suggestQuantity = () => {
+        if (initialStockItem && initialStockItem.minThreshold) {
+        const suggestedQty = initialStockItem.minThreshold * 2;
+        setFormData(prev => ({ ...prev, quantity: suggestedQty }));
+        }
+    };
 
-onClose();
-};
-
-return (
-<Dialog open={open} onOpenChange={onClose}>
-<DialogContent className="max-w-2xl p-0 overflow-hidden bg-transparent border-none shadow-none">
-    <Card className="w-full max-w-2xl">
-    <CardHeader>
-    <CardTitle>
-        Nouveau Réapprovisionnement
-    </CardTitle>
-    </CardHeader>
-
-    <CardContent className="p-6">
-    <form
-        onSubmit={handleSubmit}
-        className="space-y-6"
-    >
-        {/* TYPE */}
-        <div className="space-y-2">
-        <Label>
-            Type d&apos;approvisionnement *
-        </Label>
-
-        <Select
-            value={category}
-            onChange={(e) =>
-            setCategory(e.target.value as Category)
-            }
-        >
-            <option value="flock">
-            Lot de volailles (Bande)
-            </option>
-
-            <option value="feed">
-            Aliment
-            </option>
-
-            <option value="vaccine">
-            Vaccin
-            </option>
-
-            <option value="medication">
-            Médicament
-            </option>
-
-            <option value="equipment">
-            Équipement
-            </option>
-
-            <option value="other">
-            Autre
-            </option>
-        </Select>
-        </div>
-
-        {/* FERME */}
-        <div className="space-y-2">
-        <Label>Ferme *</Label>
-
-        <Select
-            value={formData.farmId}
-            onChange={(e) =>
-            handleChange("farmId", e.target.value)
-            }
-        >
-            <option value="">
-            Sélectionner une ferme
-            </option>
-
-            {mockFarms.map((farm) => (
-            <option
-                key={farm.id}
-                value={farm.id}
-            >
-                {farm.name}
-            </option>
-            ))}
-        </Select>
-        </div>
-
-        {/* DATE */}
-        <div className="space-y-2">
-        <Label>
-            Date du réapprovisionnement *
-        </Label>
-
-        <Input
-            type="date"
-            value={formData.restockDate}
-            onChange={(e) =>
-            handleChange(
-                "restockDate",
-                e.target.value
-            )
-            }
-        />
-        </div>
-
-        {/* FLOCK */}
-        {category === "flock" ? (
-        <div className="space-y-4">
-            <div className="space-y-2">
-            <Label>
-                Nom de la Bande *
-            </Label>
-
-            <Input
-                value={formData.name}
-                onChange={(e) =>
-                handleChange(
-                    "name",
-                    e.target.value
-                )
+        useEffect(() => {
+        if (open) {
+            fetchFarms();
+            fetchSuppliers();
+            if (initialStockItem) {
+            setFormData({
+                name: initialStockItem.name,
+                farmId: initialStockItem.farmId,
+                supplierId: initialStockItem.supplierId || "",
+                quantity: initialStockItem.quantity,
+                unit: initialStockItem.unit,
+                minThreshold: initialStockItem.minThreshold,
+                unitPrice: initialStockItem.unitPrice || 0,
+                expiryDate: initialStockItem.expiryDate || "",
+                restockDate: initialStockItem.lastRestocked?.split("T")[0] || new Date().toISOString().split("T")[0],
+                notes: initialStockItem.notes || ""
+            });
+            setCategory(initialStockItem.category);
+            
+            if (initialStockItem.category === ("feed" as Category)) {
+                const name = initialStockItem.name.toLowerCase();
+                if (name.includes("starter") || name.includes("demarrage")) {
+                setFeedSubType("starter");
+                } else if (name.includes("grower") || name.includes("croissance")) {
+                setFeedSubType("grower");
+                } else if (name.includes("finisher") || name.includes("finition")) {
+                setFeedSubType("finisher");
                 }
-                placeholder="Ex: Bande B3 - 2026"
-            />
-            </div>
+            }
+            } else {
+            resetForm();
+            }
+        }
+    }, [open, initialStockItem]);
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-                <Label>
-                Espèce *
-                </Label>
+    const resetForm = () => {
+        setFormData({
+        name: "",
+        farmId: "",
+        supplierId: "",
+        quantity: 0,
+        unit: "",
+        minThreshold: 0,
+        unitPrice: 0,
+        expiryDate: "",
+        restockDate: new Date().toISOString().split("T")[0],
+        notes: ""
+        });
+        setCategory("feed");
+        setFeedSubType("starter");
+    };
 
-                <Select
-                value={formData.especeId}
-                onChange={(e) =>
-                    handleChange(
-                    "especeId",
-                    e.target.value
-                    )
-                }
-                >
-                <option value="">
-                    Choisir l&apos;espèce
-                </option>
+    const updateProductName = (subType: FeedSubType) => {
+        if (category === "feed") {
+        const names = {
+            starter: "Aliment démarrage",
+            grower: "Aliment croissance",
+            finisher: "Aliment finition"
+        };
+        setFormData(prev => ({ ...prev, name: names[subType] }));
+        }
+    };
 
-                <option value="chicken">
-                    Poulet
-                </option>
+    const handleFeedSubTypeChange = (value: FeedSubType) => {
+        setFeedSubType(value);
+        updateProductName(value);
+    };
 
-                <option value="duck">
-                    Canard
-                </option>
+    const handleCategoryChange = (value: Category) => {
+        setCategory(value);
 
-                <option value="turkey">
-                    Dinde
-                </option>
-                </Select>
-            </div>
+        if (initialStockItem && isEditMode) return;
 
-            <div className="space-y-2">
-                <Label>
-                Nombre d&apos;animaux *
-                </Label>
+        if (value === "feed") {
+        setFormData(prev => ({ ...prev, name: "Aliment" }));
+        } else if (value === "vaccine") {
+        setFormData(prev => ({ ...prev, name: "Vaccin" }));
+        } else if (value === "medication") {
+        setFormData(prev => ({ ...prev, name: "Médicament" }));
+        } else if (value === "equipment") {
+        setFormData(prev => ({ ...prev, name: "Équipement" }));
+        } else if (value === "other") {
+        setFormData(prev => ({ ...prev, name: "Autre produit" }));
+        }
+    };
 
-                <Input
-                type="number"
-                value={formData.quantity}
-                onChange={(e) =>
-                    handleChange(
-                    "quantity",
-                    parseInt(e.target.value) || 0
-                    )
-                }
-                />
-            </div>
-            </div>
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        try {
+        let finalName = formData.name;
+        if (category === "feed" && !finalName.toLowerCase().includes(feedSubType)) {
+            const subTypeLabels = {
+            starter: "Démarrage",
+            grower: "Croissance", 
+            finisher: "Finition"
+            };
+            finalName = `${subTypeLabels[feedSubType]} - ${finalName}`;
+        }
 
-                {/* Fournisseur */}
+        const stockData = {
+            name: finalName,
+            category: category,
+            quantity: formData.quantity,
+            unit: formData.unit,
+            min_threshold: formData.minThreshold,
+            farm_id: formData.farmId,
+            supplier_id: formData.supplierId || null,
+            last_restocked: formData.restockDate,
+            expiry_date: formData.expiryDate || null,
+            unit_price: formData.unitPrice,
+            notes: category === "feed" ? `Type d'aliment: ${feedSubType}\n${formData.notes}` : formData.notes,
+            feedSubType: category === "feed" ? feedSubType : undefined,
+        };
+
+        let result;
+        if (initialStockItem && isEditMode) {
+            result = await stockAPI.update(initialStockItem.id, stockData);
+        } else if (initialStockItem && !isEditMode) {
+            result = await stockAPI.adjustQuantity(initialStockItem.id, formData.quantity, "entry", `Réapprovisionnement - ${category === "feed" ? feedSubType : ""}`);
+        } else {
+            result = await stockAPI.create(stockData);
+        }
+        
+        onSave(result);
+        onClose();
+        resetForm();
+        } catch (error) {
+        console.error("Erreur sauvegarde:", error);
+        alert("Erreur lors de l'enregistrement");
+        } finally {
+        setLoading(false);
+        }
+    };
+
+    const handleChange = (field: string, value: string | number) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const getTitle = () => {
+        if (isEditMode) return "Modifier l'article";
+        if (initialStockItem && !isEditMode) return "Réapprovisionner";
+        return "Nouvel article";
+    };
+
+    const getButtonText = () => {
+        if (loading) return "Enregistrement...";
+        if (isEditMode) return "Mettre à jour";
+        if (initialStockItem && !isEditMode) return "Réapprovisionner";
+        return "Enregistrer";
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={onClose}>
+        <DialogContent className="max-w-2xl p-0">
+            <DialogHeader>
+            <DialogTitle>{getTitle()}</DialogTitle>
+            </DialogHeader>
+            <div className="p-6 pt-0">
+            <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
-                <Label>Fournisseur</Label>
-
-                <Select
-                    value={formData.supplier}
-                    onChange={(e) =>
-                    handleChange("supplier", e.target.value)
-                    }
-                >
-                    <option value="">
-                    Choisir un fournisseur
-                    </option>
-
-                    {mockSuppliers.map((supplier) => (
-                    <option
-                        key={supplier.id}
-                        value={supplier.id}
-                    >
-                        {supplier.name}
-                    </option>
-                    ))}
+                <Label>Catégorie *</Label>
+                <Select value={category} onChange={(e) => handleCategoryChange(e.target.value as Category)} required>
+                    <option value="feed">Aliment</option>
+                    <option value="vaccine">Vaccin</option>
+                    <option value="medication">Médicament</option>
+                    <option value="equipment">Équipement</option>
+                    <option value="other">Autre</option>
                 </Select>
                 </div>
 
-                {/* FERME */}
+                {category === "feed" && (
                 <div className="space-y-2">
-                <Label>Ferme *</Label>
-
-                <Select
-                    value={formData.farmId}
-                    onChange={(e) =>
-                    handleChange("farmId", e.target.value)
-                    }
-                >
-                    <option value="">
-                    Sélectionner une ferme
-                    </option>
-
-                    {mockFarms.map((farm) => (
-                    <option
-                        key={farm.id}
-                        value={farm.id}
-                    >
-                        {farm.name}
-                    </option>
-                    ))}
-                </Select>
-                </div>
-
-            <div className="space-y-2">
-                <Label>
-                Prix unitaire (FCFA)
-                </Label>
-
-                    <Input
-                    type="number"
-                    value={formData.prixUnitaire}
-                    onChange={(e) =>
-                        handleChange(
-                        "prixUnitaire",
-                        parseFloat(e.target.value) || 0
-                        )
-                    }
-                    />
-                </div>
-                </div>
-            </div>
-            ) : (
-            /* STOCK */
-            <div className="space-y-4">
-                <div className="space-y-2">
-                <Label>
-                    Nom du produit *
-                </Label>
-
-                <Input
-                    value={formData.name}
-                    onChange={(e) =>
-                    handleChange(
-                        "name",
-                        e.target.value
-                    )
-                    }
-                />
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <div className="space-y-2">
-                    <Label>
-                    Quantité *
-                    </Label>
-
-                    <Input
-                    type="number"
-                    value={formData.quantity}
-                    onChange={(e) =>
-                        handleChange(
-                        "quantity",
-                        parseInt(e.target.value) || 0
-                        )
-                    }
-                    />
-                </div>
-
-                <div className="space-y-2">
-                    <Label>
-                    Unité *
-                    </Label>
-
-                    <Input
-                    value={formData.unit}
-                    onChange={(e) =>
-                        handleChange(
-                        "unit",
-                        e.target.value
-                        )
-                    }
-                    />
-                </div>
-
-                <div className="space-y-2">
-                    <Label>
-                    Seuil minimum
-                    </Label>
-
-                    <Input
-                    type="number"
-                    value={formData.minThreshold}
-                    onChange={(e) =>
-                        handleChange(
-                        "minThreshold",
-                        parseInt(e.target.value) || 0
-                        )
-                    }
-                    />
-                </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {/* Fournisseur */}
-                    <div className="space-y-2">
-                    <Label>Fournisseur</Label>
-
-                    <Select
-                        value={formData.supplier}
-                        onChange={(e) =>
-                        handleChange("supplier", e.target.value)
-                        }
-                    >
-                        <option value="">
-                        Choisir un fournisseur
-                        </option>
-
-                        {mockSuppliers.map((supplier) => (
-                        <option
-                            key={supplier.id}
-                            value={supplier.id}
-                        >
-                            {supplier.name}
-                        </option>
-                        ))}
+                    <Label>Type d'aliment *</Label>
+                    <Select value={feedSubType} onChange={(e) => handleFeedSubTypeChange(e.target.value as FeedSubType)} required>
+                    <option value="starter">Démarrage (0-10 jours)</option>
+                    <option value="grower">Croissance (11-24 jours)</option>
+                    <option value="finisher">Finition (25+ jours)</option>
                     </Select>
-                    </div>
-
-                {(category === "vaccine" ||
-                    category === "medication") && (
-                    <div className="space-y-2">
-                    <Label>
-                        Date d&apos;expiration
-                    </Label>
-
-                    <Input
-                        type="date"
-                        value={formData.expiryDate}
-                        onChange={(e) =>
-                        handleChange(
-                            "expiryDate",
-                            e.target.value
-                        )
-                        }
-                    />
-                    </div>
-                )}
+                    <p className="text-xs text-gray-500">
+                    {feedSubType === "starter" && "Protéines 22% - pour les poussins de 0 à 10 jours"}
+                    {feedSubType === "grower" && "Protéines 19% - pour les poulets de 11 à 24 jours"}
+                    {feedSubType === "finisher" && "Protéines 17% - pour les poulets de 25+ jours"}
+                    </p>
                 </div>
+                )}
+
+                <div className="space-y-2">
+                <Label>Nom du produit *</Label>
+                <Input 
+                    value={formData.name} 
+                    onChange={(e) => handleChange("name", e.target.value)} 
+                    placeholder="Nom du produit"
+                    required 
+                />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label>Ferme *</Label>
+                    <Select 
+                    value={formData.farmId} 
+                    onChange={(e) => handleChange("farmId", e.target.value)} 
+                    required
+                    >
+                    <option value="">Sélectionner une ferme</option>
+                    {farms.map(farm => <option key={farm.id} value={farm.id}>{farm.name}</option>)}
+                    </Select>
+                </div>
+                <div className="space-y-2">
+                    <Label>Fournisseur</Label>
+                    <Select value={formData.supplierId} onChange={(e) => handleChange("supplierId", e.target.value)}>
+                    <option value="">Sélectionner un fournisseur</option>
+                    {suppliers.filter(s => s.active).map(supplier => (
+                        <option key={supplier.id} value={supplier.id}>{supplier.name}</option>
+                    ))}
+                    </Select>
+                </div>
+                </div>
+
+                {/* Section stock actuel (amélioration) */}
+                {initialStockItem && !isEditMode && (
+                <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-sm text-gray-600">
+                    Stock actuel: <strong>{initialStockItem.quantity} {initialStockItem.unit}</strong>
+                    </p>
+                    {initialStockItem.minThreshold > 0 && (
+                    <p className="text-sm text-gray-600 mt-1">
+                        Seuil minimum: <strong>{initialStockItem.minThreshold} {initialStockItem.unit}</strong>
+                    </p>
+                    )}
+                    <Button type="button" variant="outline" size="sm" className="mt-2" onClick={suggestQuantity}>
+                    Suggérer quantité
+                    </Button>
+                </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                    <Label>Quantité *</Label>
+                    <Input 
+                    type="number" 
+                    value={formData.quantity} 
+                    onChange={(e) => handleChange("quantity", parseFloat(e.target.value) || 0)} 
+                    required 
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label>Unité *</Label>
+                    <Input 
+                    value={formData.unit} 
+                    onChange={(e) => handleChange("unit", e.target.value)} 
+                    placeholder="kg, l, doses..." 
+                    required 
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label>Seuil minimum</Label>
+                    <Input 
+                    type="number" 
+                    value={formData.minThreshold} 
+                    onChange={(e) => handleChange("minThreshold", parseFloat(e.target.value) || 0)} 
+                    />
+                </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label>Prix unitaire (FCFA)</Label>
+                    <Input 
+                    type="number" 
+                    value={formData.unitPrice} 
+                    onChange={(e) => handleChange("unitPrice", parseFloat(e.target.value) || 0)} 
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label>Date d'expiration</Label>
+                    <Input 
+                    type="date" 
+                    value={formData.expiryDate} 
+                    onChange={(e) => handleChange("expiryDate", e.target.value)} 
+                    />
+                </div>
+                </div>
+
+                <div className="space-y-2">
+                <Label>Date de réapprovisionnement</Label>
+                <Input 
+                    type="date" 
+                    value={formData.restockDate} 
+                    onChange={(e) => handleChange("restockDate", e.target.value)} 
+                    required 
+                />
+                </div>
+
+                <div className="space-y-2">
+                <Label>Notes</Label>
+                <Textarea 
+                    value={formData.notes} 
+                    onChange={(e) => handleChange("notes", e.target.value)} 
+                    rows={2} 
+                />
+                </div>
+
+                <div className="flex justify-end gap-3">
+                <Button type="button" variant="outline" onClick={onClose}>Annuler</Button>
+                <Button type="submit" disabled={loading}>
+                    {getButtonText()}
+                </Button>
+                </div>
+            </form>
             </div>
-            )}
-
-            {/* NOTES */}
-            <div className="space-y-2">
-            <Label>
-                Notes
-            </Label>
-
-            <Textarea
-                value={formData.notes}
-                onChange={(e) =>
-                handleChange(
-                    "notes",
-                    e.target.value
-                )
-                }
-            />
-            </div>
-
-            {/* ACTIONS */}
-            <div className="flex justify-end gap-3">
-            <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-            >
-                Annuler
-            </Button>
-
-            <Button type="submit">
-                Enregistrer le réapprovisionnement
-            </Button>
-            </div>
-        </form>
-        </CardContent>
-    </Card>
-</DialogContent>
-</Dialog>
-);
-}
+        </DialogContent>
+        </Dialog>
+    );
+    }

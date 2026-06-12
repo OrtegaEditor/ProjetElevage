@@ -1,7 +1,11 @@
 import { useEffect, useState, useRef } from 'react';
-import axios from 'axios';
 import { User } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
+import { usersAPI } from '@/services/api';
+import axios from "axios";
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/common/button';
+import { ArrowLeft } from 'lucide-react';
 
 type Farm = {
 id: string;
@@ -19,24 +23,19 @@ const [formData, setFormData] = useState<Partial<User>>({});
 
 const fileInputRef = useRef<HTMLInputElement>(null);
 const { logout } = useAuth();
+const navigate = useNavigate()
 
 useEffect(() => {
 const fetchData = async () => {
     try {
-    const token = localStorage.getItem('access_token');
-
-    const [userRes, farmsRes] = await Promise.all([
-        axios.get('http://127.0.0.1:8000/api/v1/users/me', {
-        headers: { Authorization: `Bearer ${token}` }
-        }),
-        axios.get('http://127.0.0.1:8000/api/v1/users/my-farms', {
-        headers: { Authorization: `Bearer ${token}` }
-        })
+    const [userData, farmsData] = await Promise.all([
+        usersAPI.getMe(),
+        usersAPI.getMyAccessibleFarms(),
     ]);
 
-    setUser(userRes.data);
-    setFormData(userRes.data);
-    setFarms(farmsRes.data);
+    setUser(userData);
+    setFormData(userData);
+    setFarms(farmsData);
     } catch (e) {
     console.error(e);
     } finally {
@@ -51,18 +50,14 @@ const handleSave = async () => {
 if (!user) return;
 
 try {
-    const token = localStorage.getItem('access_token');
+    const updatedUser = await usersAPI.updateUser(user.id, {
+    name: formData.name,
+    telephone: formData.telephone,
+    avatar: formData.avatar
+    });
 
-    const res = await axios.put(
-    `http://127.0.0.1:8000/api/v1/users/${user.id}`,
-    formData,
-    {
-        headers: { Authorization: `Bearer ${token}` }
-    }
-    );
-
-    setUser(res.data);
-    setFormData(res.data);
+    setUser(updatedUser);
+    setFormData(updatedUser);
     setIsEditing(false);
 } catch {
     alert("Erreur lors de la sauvegarde");
@@ -97,25 +92,11 @@ const handleAvatarUpload = async (e: any) => {
 const file = e.target.files?.[0];
 if (!file) return;
 
-const data = new FormData();
-data.append("file", file);
-
 try {
-    const token = localStorage.getItem('access_token');
+    const result = await usersAPI.uploadAvatar(file);
 
-    const res = await axios.post(
-    'http://127.0.0.1:8000/api/v1/users/upload-avatar',
-    data,
-    {
-        headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'multipart/form-data'
-        }
-    }
-    );
-
-    setUser(prev => prev ? { ...prev, avatar: res.data.url } : prev);
-    setFormData(prev => ({ ...prev, avatar: res.data.url }));
+    setUser(prev => prev ? { ...prev, avatar: result.url } : prev);
+    setFormData(prev => ({ ...prev, avatar: result.url }));
 } catch {
     alert("Erreur upload photo");
 }
@@ -129,9 +110,17 @@ return (
 
     {/* LEFT */}
     <div className="md:col-span-3 space-y-4">
+
+        <Button variant='outline'
+        onClick={() => navigate("/dashboard")}
+        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+        >
+        <ArrowLeft className="w-5 h-5 text-gray-600" />
+        </Button>
     <div className="bg-white p-6 rounded-xl shadow-sm text-center">
 
-        <input title='image'
+        <input
+        title='image'
         type="file"
         ref={fileInputRef}
         className="hidden"
@@ -155,7 +144,7 @@ return (
         </span>
 
         <p className="mt-4 text-sm">
-        {user.active ? " Actif" : " Désactivé"}
+        {user.active ? "✓ Actif" : "✗ Désactivé"}
         </p>
     </div>
     </div>
@@ -183,7 +172,8 @@ return (
             <div key={field}>
             <label className="text-xs text-gray-500">{field}</label>
 
-            <input title='telephone'
+            <input
+                title={field}
                 disabled={!isEditing}
                 className="w-full border-b outline-none"
                 value={(formData as any)[field] || ""}

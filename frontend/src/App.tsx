@@ -7,12 +7,11 @@ import { LoginPage } from "./pages/Auth/LoginPage";
 import { AppLayout } from "./components/layout/AppLayout";
 import { AgentDashboard } from "./pages/Dashboard/AgentDashboard";
 import { AdminDashboard } from "./pages/Dashboard/AdminDashboard";
-import { SalesDashboard } from "./pages/Dashboard/SaleDashboard";
 import { VeterinarianDashboard } from "./pages/Dashboard/VeterinarianDashboard";
 import { WeighingPage } from "./pages/weighingpage";
 import { IoTMonitoring } from "./pages/iotMonitoring";
 import UsersPage from "./pages/UsersPage";
-import { FarmPage } from "./pages/farmPage";
+import { FarmsPage } from "./pages/farmPage";
 import { StockManagementPage } from "./pages/StockManagementPage";
 import { PoultryHousesPage } from "./pages/PoultryHousesPage";
 import { Flockspage } from "./pages/Flockspage";
@@ -23,8 +22,11 @@ import { StockMovementsPage } from "./pages/StockMovementsPage";
 import { HealthRegisterPage } from "./pages/HealthRegisterPage";
 import { FlockDetailPage } from "./pages/FlockDetailPage";
 import { RegisterPage } from "./pages/Auth/register";
-import { TestUsersPage } from "./pages/TestUsersPage";
 import { UserProfile } from "./pages/UserProfile";
+import { SalesDashboard } from "./pages/Dashboard/SaleDashboard";
+import { SupplierManagementPage } from "./pages/SupplierManagementPage";
+import { DiseasesPage } from "./pages/DiseasesPage";
+import { ArrivalWizardPage } from "./pages/ArrivalWizardPage";
 
 
 
@@ -67,20 +69,22 @@ function AppRoutes() {
       <Route path="/weighing" element={<ProtectedRoute><WeighingPage /></ProtectedRoute>} />
       <Route path="/iot-monitoring" element={<ProtectedRoute><IoTMonitoring /></ProtectedRoute>} />
       <Route path="/users" element={<ProtectedRoute><UsersPage /></ProtectedRoute>} />
-      <Route path="/poultry-houses" element={<ProtectedRoute><FarmPage /></ProtectedRoute>} />
+      <Route path="/farms" element={<ProtectedRoute><FarmsPage /></ProtectedRoute>} />
       <Route path="/stock" element={<ProtectedRoute><StockManagementPage /></ProtectedRoute>} />
-      <Route path="/poultry-houses/:farmId" element={<ProtectedRoute><PoultryHousesPage /></ProtectedRoute>} />
+      {/* <Route path="/poultry-houses/:farmId" element={<ProtectedRoute><PoultryHousesPage /></ProtectedRoute>} /> */}
+      <Route path="/farms/:farmId/poultry-houses" element={<PoultryHousesPage />} />
       <Route path="/flocks" element={<ProtectedRoute><Flockspage /></ProtectedRoute>} />
       <Route path="/alerts" element={<ProtectedRoute><AlertsPage /></ProtectedRoute>} />
       <Route path="/Treatments" element={<ProtectedRoute><TreatmentsPage /></ProtectedRoute>} />
       <Route path="/vaccinations" element={<ProtectedRoute><VaccinationsPage /></ProtectedRoute>} />
       <Route path="/stock/movements" element={<StockMovementsPage />} />
-      <Route path="health-registry" element={<HealthRegisterPage />} />
       <Route path="/flocks/:flockId" element={<FlockDetailPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/test-users" element={<ProtectedRoute><TestUsersPage /></ProtectedRoute>} />
       <Route path="/profile" element={<UserProfile />} />
-
+      <Route path="/suppliers" element={<SupplierManagementPage />} />
+      <Route path="/health-registry" element={<ProtectedRoute><HealthRegisterPage /></ProtectedRoute>} />
+      <Route path="/diseases" element={<ProtectedRoute><DiseasesPage /></ProtectedRoute>} />
+      <Route path="/arrival/new" element={<ProtectedRoute><ArrivalWizardPage /></ProtectedRoute>} />
       {/* <Route path="/sales" element={<ProtectedRoute><SalesPage /></ProtectedRoute>} /> */}
 
 

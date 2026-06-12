@@ -13,7 +13,11 @@ class FeedingRecord(Base):
     flock_id = Column(UUID(as_uuid=True), ForeignKey("flocks.id"), nullable=False)
     feed_type = Column(String(50), nullable=False)  # starter, grower, finisher
     quantity_kg = Column(Float, nullable=False)
+    stock_item_id = Column(UUID(as_uuid=True), ForeignKey("stock_items.id"), nullable=False)  
     date = Column(DateTime, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow) 
     
+    # Relations
     flock = relationship("Flock", back_populates="feeding_records")
+    stock_item = relationship("StockItem", back_populates="feeding_records") 

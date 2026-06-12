@@ -45,8 +45,9 @@ class PoultryHouse(Base):
     active = Column(Boolean, nullable=False, default=True)  # Salle active ou désaffectée
     
     # Métadonnées
-    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
-    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
     # Relations (optionnel)
     farm = relationship("Farm", back_populates="poultry_houses")
     sensors = relationship("Sensor", back_populates="poultry_house")

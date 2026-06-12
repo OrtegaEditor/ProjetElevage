@@ -9,7 +9,7 @@ export function InviteCollaboratorForm({ onClose, onSubmit }: InviteCollaborator
   const [formData, setFormData] = useState({
     name: "", email: "", telephone: "", role: "agent", farmId: ""
   });
-  
+
   const [myFarms, setMyFarms] = useState<Farm[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingFarms, setLoadingFarms] = useState(true);
@@ -42,7 +42,7 @@ export function InviteCollaboratorForm({ onClose, onSubmit }: InviteCollaborator
       );
       onSubmit();
       onClose();
-    } catch (err) { alert("Erreur lors de l'invitation"); } 
+    } catch (err) { alert("Erreur lors de l'invitation"); }
     finally { setLoading(false); }
   };
 

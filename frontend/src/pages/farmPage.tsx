@@ -1,196 +1,292 @@
-import { useState } from "react";
-import { Plus, Pencil, Trash2, Eye } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { Plus, Search, Filter, Eye, Building2, MapPin, Users, ChevronRight, Pencil } from "lucide-react";
 import { Button } from "../components/common/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card";
 import { Badge } from "../components/common/badge";
-import { mockFarms, mockPoultryHouses, mockFlocks } from "../data/mockData";
-import { Farm, PoultryHouse, Flock } from "../types";
-import { FarmForm } from "../components/forms/farmForm";
-import { useNavigate } from "react-router-dom";
+import { Input } from "../components/common/input";
+import { farmsAPI } from "../services/api";
+import { FarmFormDrawer } from "../components/forms/farmForm";
+import type { Farm, PoultryType } from "../types";
 
-
-
-export function FarmPage() {
-  const [farms, setFarms] = useState(mockFarms);
+export function FarmsPage() {
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
-  const [selectedFarm, setSelectedFarm] = useState<Farm| null>(null);
-  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [farms, setFarms] = useState<Farm[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedPoultryType, setSelectedPoultryType] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  
+  // Drawer states
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [selectedFarm, setSelectedFarm] = useState<Farm | null>(null);
 
-  const handleView = (sensor:Farm) => {setSelectedFarm(sensor);
-      setDetailModalOpen(true);
+  useEffect(() => {
+    fetchFarms();
+  }, []);
+
+  const fetchFarms = async () => {
+    try {
+      setLoading(true);
+      const farmsData = await farmsAPI.getAll();
+      
+      // Normalisation des données (snake_case -> camelCase)
+      const normalizedFarms: Farm[] = (farmsData || []).map((farm: any) => ({
+        id: farm.id,
+        name: farm.name,
+        address: farm.address,
+        description: farm.description || "",
+        poultry_types: farm.poultry_types || farm.poultryTypes || [],
+        totalCapacity: farm.total_capacity || farm.totalCapacity || 0,
+        managerId: farm.manager_id || farm.managerId,
+        createdAt: farm.created_at || farm.createdAt || new Date().toISOString(),
+        active: farm.active !== false,
+      }));
+      
+      setFarms(normalizedFarms);
+    } catch (error) {
+      console.error("Erreur chargement des fermes:", error);
+      setFarms([]);
+    } finally {
+      setLoading(false);
+    }
   };
-  // Calculs globaux
-  const totalCapacity = farms.reduce((sum, farm) => sum + (farm.totalCapacity || 0), 0);
-  const totalOccupancy = mockPoultryHouses.reduce((sum, house) => sum + house.currentOccupancy, 0);
-  const occupancyRate = ((totalOccupancy / totalCapacity) * 100).toFixed(1);
 
-  // Helper : nombre de salles par poulailler
-  const getRoomsCount = (farmId: string) =>
-    mockPoultryHouses.filter(h => h.farmId === farmId).length;
-
-  // Helper : nombre de lots par poulailler
-  const getFlocksCount = (farmId: string) =>
-    mockFlocks.filter(f => f.farmId === farmId).length;
-
-  // Helper : total sujets par poulailler
-  const getTotalAnimals = (farmId: string) =>
-    mockFlocks
-      .filter(f => f.farmId === farmId)
-      .reduce((sum, f) => sum + f.quantity, 0);
-
-  // Helper : taux occupation poulailler
-  const getOccupancyRate = (farmId: string) => {
-    const capacity = farms.find(f => f.id === farmId)?.totalCapacity || 1;
-    const occupancy = getTotalAnimals(farmId);
-    return ((occupancy / capacity) * 100).toFixed(1);
+  const handleOpenFarm = (farmId: string) => {
+    navigate(`/farms/${farmId}/poultry-houses`);
   };
 
   const handleEditFarm = (farm: Farm) => {
     setSelectedFarm(farm);
-    setOpen(true);
-};
-  return (
-    <div className="space-y-6">
-      {/* HEADER */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900 mb-1">
-            Gestion des poulaillers
-          </h1>
-          <p className="text-gray-600">
-            Administration des bâtiments d'élevage
-          </p>
+    setIsDrawerOpen(true);
+  };
+
+  const handleCreateFarm = () => {
+    setSelectedFarm(null);
+    setIsDrawerOpen(true);
+  };
+
+  const handleDrawerSuccess = () => {
+    fetchFarms();
+    setIsDrawerOpen(false);
+    setSelectedFarm(null);
+  };
+
+  const uniquePoultryTypes = useMemo(() => {
+    const types = new Set<string>();
+    farms.forEach((farm) => {
+      farm.poultry_types?.forEach((type) => {
+        types.add(type);
+      });
+    });
+    return Array.from(types);
+  }, [farms]);
+
+  const filteredFarms = useMemo(() => {
+    let filtered = [...farms];
+    
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(farm =>
+        farm.name.toLowerCase().includes(term) ||
+        farm.address?.toLowerCase().includes(term)
+      );
+    }
+    
+    if (selectedPoultryType) {
+      filtered = filtered.filter(farm => {
+        const types = farm.poultry_types;
+        return types && types.includes(selectedPoultryType as PoultryType);
+      });
+    }
+    
+    if (statusFilter === "active") {
+      filtered = filtered.filter(farm => farm.active === true);
+    } else if (statusFilter === "inactive") {
+      filtered = filtered.filter(farm => farm.active === false);
+    }
+    
+    return filtered;
+  }, [farms, searchTerm, selectedPoultryType, statusFilter]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
+          <p className="text-gray-500">Chargement des fermes...</p>
         </div>
-        <Button  onClick={() => setOpen(true)}>
-        <Plus className="w-4 h-4 mr-2" />
-          Nouveau poulailler
-        </Button>{open && (
-            <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-            <div className="bg-white w-full max-w-lg p-6 rounded-xl shadow-lg relative">
-            <Button onClick={() => setOpen(false)}  className="absolute top-2 right-2 text-white" >
-                ✕
-            </Button>
-                <FarmForm farm={selectedFarm} onClose={() => { setOpen(false); setSelectedFarm(null); }} />
-            </div>
-            </div>
-        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6 p-4 md:p-6 bg-gray-50 min-h-screen">
+      
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Mes fermes</h1>
+          <p className="text-sm text-gray-500 mt-1">Gérez vos fermes et leurs infrastructures</p>
+        </div>
+        <Button onClick={handleCreateFarm} className="bg-emerald-600 hover:bg-emerald-700 gap-2">
+          <Plus className="w-4 h-4" />
+          Nouvelle ferme
+        </Button>
       </div>
 
-      {/* STATS */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-sm text-gray-500 mb-1">Total poulaillers</p>
-            <h2 className="text-3xl font-bold text-gray-900">{farms.length}</h2>
-          </CardContent>
-        </Card>
+      {/* Filtres */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex flex-wrap gap-4">
+            <div className="flex-1 min-w-200px">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="Rechercher par nom ou adresse..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 w-full"
+                />
+              </div>
+            </div>
+            
+            <select
+              title="Filtrer par type de volaille"
+              value={selectedPoultryType}
+              onChange={(e) => setSelectedPoultryType(e.target.value)}
+              className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            >
+              <option value="">Tous les types</option>
+              {uniquePoultryTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type === "broiler" ? "Poulets de chair" :
+                    type === "layer" ? "Poules pondeuses" :
+                    type === "turkey" ? "Dindes" :
+                    type === "duck" ? "Canards" : "Oies"}
+                </option>
+              ))}
+            </select>
+            
+            <select
+              title="Filtrer par statut"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as any)}
+              className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            >
+              <option value="all">Tous les statuts</option>
+              <option value="active">Actives</option>
+              <option value="inactive">Inactives</option>
+            </select>
+          </div>
+        </CardContent>
+      </Card>
 
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-sm text-gray-500 mb-1">Capacité totale</p>
-            <h2 className="text-3xl font-bold text-gray-900">{totalCapacity}</h2>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-sm text-gray-500 mb-1">Occupation actuelle</p>
-            <h2 className="text-3xl font-bold text-gray-900">{totalOccupancy}</h2>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-sm text-gray-500 mb-1">Taux d'occupation</p>
-            <h2 className="text-3xl font-bold text-gray-900">{occupancyRate}%</h2>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* GRILLE POULAILLERS */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {farms.map((farm: Farm) => {
-          const roomsCount = getRoomsCount(farm.id);
-          const flocksCount = getFlocksCount(farm.id);
-          const totalAnimals = getTotalAnimals(farm.id);
-          const occupancyRate = getOccupancyRate(farm.id);
-
-          return (
-            <Card key={farm.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle>{farm.name}</CardTitle>
-                    <p className="text-sm text-gray-500 mt-1">{farm.address}</p>
+      {/* Liste des fermes */}
+      {filteredFarms.length === 0 ? (
+        <div className="text-center py-12 bg-white rounded-lg border">
+          <Building2 className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+          <p className="text-gray-500">Aucune ferme trouvée</p>
+          <Button variant="primary" className="mt-4" onClick={handleCreateFarm}>
+            <Plus className="w-4 h-4 mr-2" />
+            Créer votre première ferme
+          </Button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredFarms.map((farm) => {
+            const poultryTypes = farm.poultry_types;
+            const capacity = farm.totalCapacity || 0;
+            
+            return (
+              <Card 
+                key={farm.id} 
+                className="hover:shadow-lg transition-shadow"
+              >
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-2">
+                      <Building2 className="w-5 h-5 text-emerald-600" />
+                      <CardTitle className="text-lg font-semibold">{farm.name}</CardTitle>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="p-1 h-8 w-8 text-blue-600"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditFarm(farm);
+                        }}
+                        title="Modifier"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Badge variant={farm.active ? "success" : "warning"}>
+                        {farm.active ? "Active" : "Inactive"}
+                      </Badge>
+                    </div>
                   </div>
-                  {farm.active && (
-                    <Badge variant="success">Actif</Badge>
+                </CardHeader>
+              
+                <CardContent className="space-y-4">
+                  {farm.address && (
+                    <div className="flex items-start gap-2 text-sm text-gray-600">
+                      <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
+                      <span>{farm.address}</span>
+                    </div>
                   )}
-                </div>
-              </CardHeader>
+                  
+                  {poultryTypes && poultryTypes.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {poultryTypes.map((type) => (
+                        <Badge key={type} variant="outline" className="text-xs">
+                          {type === "broiler" ? "Poulets" :
+                            type === "layer" ? "Pondeuses" :
+                            type === "turkey" ? "Dindes" :
+                            type === "duck" ? "Canards" : "Oies"}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {farm.description && (
+                    <p className="text-sm text-gray-500 line-clamp-2">{farm.description}</p>
+                  )}
+                  
+                  <div className="flex justify-between items-center pt-3 border-t border-gray-100">
+                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                      <Users className="w-4 h-4" />
+                      <span>Capacité: {capacity > 0 ? capacity.toLocaleString() : "Non définie"}</span>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="gap-1 text-emerald-600"
+                      onClick={() => handleOpenFarm(farm.id)}
+                    >
+                      Ouvrir
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
 
-              <CardContent className="space-y-4">
-                {/* Résumé */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <p className="text-xs text-gray-500">Capacité</p>
-                    <p className="font-semibold text-gray-900">{farm.totalCapacity}</p>
-                  </div>
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <p className="text-xs text-gray-500">Total sujets</p>
-                    <p className="font-semibold text-gray-900">{totalAnimals}</p>
-                  </div>
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <p className="text-xs text-gray-500">Salles</p>
-                    <p className="font-semibold text-gray-900">{roomsCount}</p>
-                  </div>
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <p className="text-xs text-gray-500">Lots actifs</p>
-                    <p className="font-semibold text-gray-900">{flocksCount}</p>
-                  </div>
-                </div>
-
-                {/* Barre occupation */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Taux d'occupation</span>
-                    <span className="font-semibold text-gray-900">{occupancyRate}%</span>
-                  </div>
-                  <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-[#2E7D32] transition-all"
-                      style={{ width: `${occupancyRate}%` }}
-                    />
-                  </div>
-                </div>
-
-                {/* Description */}
-                {farm.description && (
-                  <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-                    {farm.description}
-                  </p>
-                )}
-
-                {/* Actions */}
-                <div className="flex items-center gap-2 pt-2">
-                  <Button variant="outline" className="flex-1" onClick={() => navigate(`/poultry-houses/${farm.id}`)}>
-                    <Eye className="w-4 h-4 mr-2" />
-                    Parcourir
-                  </Button>
-                  <Button onClick={() => { setSelectedFarm(farm); setOpen(true); }} className="p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors">
-                      <Pencil className="w-4 h-4 text-blue-600" />
-                  </Button>
-                  <Button className="p-2 border bg-white  border-gray-300 rounded-lg hover:bg-red-50 transition-colors">
-                    <Trash2 className="w-4 h-4 text-red-600" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+      {/* Drawer pour création/modification */}
+      <FarmFormDrawer
+        open={isDrawerOpen}
+        onClose={() => {
+          setIsDrawerOpen(false);
+          setSelectedFarm(null);
+        }}
+        onSuccess={handleDrawerSuccess}
+        initialData={selectedFarm}
+      />
     </div>
   );
 }
-

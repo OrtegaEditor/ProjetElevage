@@ -30,7 +30,7 @@ from app.schemas.user import InviteCollaboratorCreate, UserResponse, UserRole
 from app.schemas.band import BandCreate, BandResponse
 from app.schemas.stock_item import StockItemCreate, StockItemResponse, StockCategory
 from app.schemas.sensor import SensorCreate, SensorUpdate, SensorResponse, SensorType, SensorStatus
-from app.schemas.task import TaskCreate, TaskUpdate, TaskResponse, TaskType, TaskStatus
+from app.schemas.task import TaskCreate, TaskUpdate, TaskResponse
 from app.schemas.treatment import TreatmentCreate, TreatmentUpdate, TreatmentResponse
 from app.schemas.vaccination import VaccinationCreate, VaccinationUpdate, VaccinationResponse
 from app.schemas.weighing import WeighingCreate, WeighingResponse

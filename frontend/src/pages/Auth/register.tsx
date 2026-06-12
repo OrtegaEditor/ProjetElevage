@@ -52,7 +52,7 @@ return (
         </h1>
 
         <p className="text-gray-600">
-            Rejoignez PoultryConnect IoT
+            Rejoignez SYGEXA
         </p>
         </div>
 

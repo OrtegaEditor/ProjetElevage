@@ -25,8 +25,8 @@ class Flock(Base):
     age = Column(Integer, nullable=True)
     sale_price = Column(Integer, nullable=True)
     
-    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
-    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     espece_id = Column(UUID(as_uuid=True), ForeignKey("especes.id"), nullable=True)
     # Nouvelles colonnes pour la division de lot
     parent_flock_id = Column(UUID(as_uuid=True), ForeignKey("flocks.id"), nullable=True)

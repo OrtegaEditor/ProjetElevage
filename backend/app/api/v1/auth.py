@@ -28,11 +28,24 @@ def register(data: RegisterRequest, db: Session = Depends(get_db)):
     """
     Inscription utilisateur et connexion automatique
     """
+    print("=== DATA REÇUE ===")
+    print(f"name: {data.name}")
+    print(f"email: {data.email}")
+    print(f"telephone: {data.telephone}")
+    print(f"password length: {len(data.password)}")
+    
     try:
         if not data.telephone:
             raise ValueError("Téléphone requis")
+        
+        # Vérifier si email existe déjà
+        existing_user = db.query(User).filter(User.email == data.email).first()
+        if existing_user:
+            raise ValueError("Email déjà utilisé")
 
         user = register_user(db, data)
+        print(f" Utilisateur créé: {user.id}")
+        
         tokens = login_user(
             db,
             LoginRequest(
@@ -40,18 +53,40 @@ def register(data: RegisterRequest, db: Session = Depends(get_db)):
                 password=data.password,
             ),
         )
+        print(f"Tokens générés")
         
-        # On renvoie les tokens + l'utilisateur pour satisfaire TokenResponse
-        return {
-            **tokens,
-            "user": user
+        user_data = {
+            "id": str(user.id),
+            "name": user.name,
+            "email": user.email,
+            "role": user.role,
+            "telephone": user.telephone,
+            "avatar": user.avatar
         }
+        
+        response_data = {
+            **tokens,
+            "user": user_data
+        }
+        print(f" Réponse préparée")
+        return response_data
+        
     except ValueError as e:
+        print(f" Erreur ValueError: {e}")
         raise HTTPException(
             status_code=400,
             detail=str(e),
         )
-
+    except Exception as e:
+        print(f" Erreur inattendue: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=400,
+            detail=f"Erreur: {str(e)}",
+        )
+        
+        
 @router.post("/login", response_model=TokenResponse)
 def login(data: LoginRequest, db: Session = Depends(get_db)):
     """

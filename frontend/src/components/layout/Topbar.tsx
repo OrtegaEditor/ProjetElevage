@@ -11,7 +11,7 @@ const { user, logout } = useAuth();
 const [showUserMenu, setShowUserMenu] = useState(false);
 
 // Calcul du nombre d'alertes non résolues
-const unreadAlerts = mockAlerts.filter((a) => !a.resolved).length;
+const unreadAlerts = mockAlerts.filter((a) => !a.resolvedAt).length;
 
 const getRoleLabel = (role: string) => {
   const labels: Record<string, string> = {

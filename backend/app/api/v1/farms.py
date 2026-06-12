@@ -1,6 +1,6 @@
 from uuid import UUID
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query,status
 from sqlalchemy.orm import Session, joinedload
 
 from app.core.database import get_db
@@ -9,6 +9,7 @@ from app.models.user import User
 from app.models.farm import Farm
 from app.models.poultry_house import PoultryHouse
 from app.models.flock import Flock
+from app.models.farm_member import FarmMember
 from app.schemas.farm import FarmResponse, FarmCreate, FarmUpdate
 from app.schemas.poultry_house import PoultryHouseResponse
 from app.schemas.flock import FlockResponse
@@ -66,17 +67,54 @@ def get_farms(
 ):
     """Récupère toutes les fermes accessibles par l'utilisateur avec filtres"""
     
-    # Récupérer les fermes où l'utilisateur est manager
-    farms_where_manager = db.query(Farm).filter(Farm.manager_id == current_user.id).all()
+    farms_ids = set()
     
+    # 1. ADMIN : voit toutes les fermes
+    if current_user.role == "admin":
+        farms_query = db.query(Farm)
+    
+    else:
+        # 2. Fermes où l'utilisateur est manager (créateur)
+        manager_farms = db.query(Farm).filter(Farm.manager_id == current_user.id).all()
+        for farm in manager_farms:
+            farms_ids.add(farm.id)
+        
+        # 3. Fermes où l'utilisateur est membre via farm_members
+        memberships = db.query(FarmMember).filter(FarmMember.user_id == current_user.id).all()
+        for membership in memberships:
+            farms_ids.add(membership.farm_id)
+        
+        if not farms_ids:
+            return []
+        
+        farms_query = db.query(Farm).filter(Farm.id.in_(farms_ids))
+    
+    # Appliquer les filtres
+    if search:
+        search_lower = f"%{search.lower()}%"
+        farms_query = farms_query.filter(
+            (func.lower(Farm.name).like(search_lower)) | 
+            (func.lower(Farm.address).like(search_lower))
+        )
+    
+    if active_only:
+        farms_query = farms_query.filter(Farm.active == True)
+    
+    # Pagination et tri
+    farms = farms_query.order_by(Farm.name).offset(skip).limit(limit).all()
+    
+    # Construire la réponse
     result = []
-    for farm in farms_where_manager:
+    for farm in farms:
+        # Récupérer les types de volaille (ARRAY PostgreSQL)
+        poultry_types = farm.poultry_types if farm.poultry_types else []
+        
         result.append({
             "id": farm.id,
             "name": farm.name,
             "address": farm.address,
-            "description": farm.description,
-            "poultry_types": [],
+            "description": farm.description or "",
+            "poultry_types": poultry_types,
             "manager_id": farm.manager_id,
             "total_capacity": farm.total_capacity,
             "active": farm.active,
@@ -84,20 +122,7 @@ def get_farms(
             "updated_at": farm.updated_at
         })
     
-    # Appliquer les filtres
-    filtered = result
-    if search:
-        search_lower = search.lower()
-        filtered = [f for f in filtered if search_lower in f["name"].lower() or (f["address"] and search_lower in f["address"].lower())]
-    
-    if active_only:
-        filtered = [f for f in filtered if f["active"]]
-    
-    # Pagination
-    paginated = filtered[skip:skip + limit]
-    
-    return paginated
-
+    return result
 
 # =========================
 # GET FARM BY ID

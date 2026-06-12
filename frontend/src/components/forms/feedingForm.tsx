@@ -1,6 +1,13 @@
+import { Feeding } from "@/types";
 import { mockFlocks, mockPoultryHouses } from "../../data/mockData";
 
-export default function FeedingForm() {
+interface feedingFormProps {
+feeding?: Feeding | null;
+onClose: () => void;
+onSave: (feeding: Feeding) => void;
+}
+
+export default function FeedingForm({ feeding, onClose, onSave }: feedingFormProps) {
 return (
 <div>
     <select title="lot" className="border p-2 w-full mb-2">

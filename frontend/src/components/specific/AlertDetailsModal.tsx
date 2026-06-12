@@ -33,7 +33,7 @@ const isAutoRegulated = AUTO_REGULATED_ALERTS.includes(alert.type);
 const requiresManualAction = MANUAL_ACTION_ALERTS.includes(alert.type);
 
 const handleAcknowledge = () => {
-console.log("Accusé de réception :", alert.id);
+console.log("Accusé de réception :"+alert.id);
 // TODO: Appel API pour marquer comme "acknowledged"
 };
 

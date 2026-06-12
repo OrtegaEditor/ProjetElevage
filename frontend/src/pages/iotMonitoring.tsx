@@ -122,10 +122,10 @@ import {
             className="w-64"
             />
             <Button variant="primary" onClick={handleNewSensor}>
-            <Plus className="w-5 h-5" /> Nouveau capteur
+            <Plus className="w-5 h-5" />capteur
             </Button>
-            <Button variant="primary"><Download className="w-5 h-5" />Export Excel</Button>
-            <Button variant="primary"><Download className="w-5 h-5" />Export PDF</Button>
+            <Button variant="primary"><Download className="w-5 h-5" /> Excel</Button>
+            <Button variant="primary"><Download className="w-5 h-5" /> PDF</Button>
         </div>
         </div>
         <Card>

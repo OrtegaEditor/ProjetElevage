@@ -59,25 +59,28 @@ def get_poultry_houses(
     from app.models.farm import Farm
     from app.models.farm_member import FarmMember
     
-    # Récupérer les fermes accessibles
+    farms_ids = set()
+    
     if current_user.role == "admin":
-        accessible_farms = db.query(Farm).all()
+        query = db.query(PoultryHouse)
     else:
-        accessible_farms = db.query(Farm).join(Farm.members).filter(
-            Farm.members.any(id=current_user.id)
-        ).all()
-    
-    accessible_farm_ids = [f.id for f in accessible_farms]
-    
-    if not accessible_farm_ids:
-        return []
-    
-    query = db.query(PoultryHouse).filter(
-        PoultryHouse.farm_id.in_(accessible_farm_ids)
-    )
+        # Fermes où l'utilisateur est manager
+        manager_farms = db.query(Farm).filter(Farm.manager_id == current_user.id).all()
+        for farm in manager_farms:
+            farms_ids.add(farm.id)
+        
+        # Fermes où l'utilisateur est membre via farm_members
+        memberships = db.query(FarmMember).filter(FarmMember.user_id == current_user.id).all()
+        for membership in memberships:
+            farms_ids.add(membership.farm_id)
+        
+        if not farms_ids:
+            return []
+        
+        query = db.query(PoultryHouse).filter(PoultryHouse.farm_id.in_(farms_ids))
     
     if farm_id:
-        if farm_id not in accessible_farm_ids:
+        if current_user.role != "admin" and farm_id not in farms_ids:
             raise HTTPException(status_code=403, detail="Accès non autorisé à cette ferme")
         query = query.filter(PoultryHouse.farm_id == farm_id)
     
@@ -86,7 +89,6 @@ def get_poultry_houses(
     
     houses = query.offset(skip).limit(limit).all()
     return houses
-
 
 # =========================
 # GET BY FARM
