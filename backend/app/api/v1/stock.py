@@ -228,8 +228,8 @@ def check_stock_availability(
             "current_stock": available_qty,
             "unit": stock_item.unit
         }
-        
-        
+
+
 @router.get("/", response_model=List[StockItemResponse])
 def get_stock_items(
     farm_id: Optional[UUID] = Query(None),

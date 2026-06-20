@@ -5,7 +5,7 @@ import { Button } from "../components/common/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card";
 import { Badge } from "../components/common/badge";
 import { Input } from "../components/common/input";
-import { farmsAPI } from "../services/api";
+import { farmsAPI, usersAPI } from "../services/api";
 import { FarmFormDrawer } from "../components/forms/farmForm";
 import type { Farm, PoultryType } from "../types";
 
@@ -28,7 +28,7 @@ export function FarmsPage() {
   const fetchFarms = async () => {
     try {
       setLoading(true);
-      const farmsData = await farmsAPI.getAll();
+      const farmsData = await usersAPI.getMyAccessibleFarms();
       
       // Normalisation des données (snake_case -> camelCase)
       const normalizedFarms: Farm[] = (farmsData || []).map((farm: any) => ({

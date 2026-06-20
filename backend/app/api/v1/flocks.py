@@ -120,17 +120,14 @@ def get_flocks(
     
     farms_ids = set()
     
-    # 1. ADMIN : voit tous les lots
+    # 1. ADMIN : voit les lots des fermes qu'il a créées
     if current_user.role == "admin":
-        flocks = db.query(Flock).all()
-    
-    else:
-        # 2. Fermes où l'utilisateur est manager
+        # L'admin voit les fermes où il est manager
         manager_farms = db.query(Farm).filter(Farm.manager_id == current_user.id).all()
         for farm in manager_farms:
             farms_ids.add(farm.id)
         
-        # 3. Fermes où l'utilisateur est membre via farm_members
+        # L'admin voit aussi les fermes où il a été ajouté comme membre
         memberships = db.query(FarmMember).filter(FarmMember.user_id == current_user.id).all()
         for membership in memberships:
             farms_ids.add(membership.farm_id)
@@ -138,9 +135,43 @@ def get_flocks(
         if not farms_ids:
             return []
         
-        # Récupérer les lots des fermes accessibles
         flocks = db.query(Flock).filter(Flock.farm_id.in_(farms_ids)).all()
     
+    # 2. VETERINARIAN : voit les lots des fermes auxquelles il a été affecté
+    elif current_user.role == "veterinarian":
+        # Récupérer les fermes où le vétérinaire est membre
+        memberships = db.query(FarmMember).filter(FarmMember.user_id == current_user.id).all()
+        for membership in memberships:
+            farms_ids.add(membership.farm_id)
+        
+        # Également les fermes où il est manager (si jamais)
+        manager_farms = db.query(Farm).filter(Farm.manager_id == current_user.id).all()
+        for farm in manager_farms:
+            farms_ids.add(farm.id)
+        
+        if not farms_ids:
+            return []
+        
+        flocks = db.query(Flock).filter(Flock.farm_id.in_(farms_ids)).all()
+    
+    # 3. AGENT : voit les lots des fermes auxquelles il a été affecté
+    else:
+        # Fermes où l'utilisateur est manager
+        manager_farms = db.query(Farm).filter(Farm.manager_id == current_user.id).all()
+        for farm in manager_farms:
+            farms_ids.add(farm.id)
+        
+        # Fermes où l'utilisateur est membre via farm_members
+        memberships = db.query(FarmMember).filter(FarmMember.user_id == current_user.id).all()
+        for membership in memberships:
+            farms_ids.add(membership.farm_id)
+        
+        if not farms_ids:
+            return []
+        
+        flocks = db.query(Flock).filter(Flock.farm_id.in_(farms_ids)).all()
+    
+    # Construction de la réponse
     result = []
     for flock in flocks:
         farm = db.query(Farm).filter(Farm.id == flock.farm_id).first()

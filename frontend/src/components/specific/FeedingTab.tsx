@@ -1,3 +1,4 @@
+// frontend/src/components/specific/FeedingTab.tsx
 import { useState, useEffect } from "react";
 import { Calculator, Package } from "lucide-react";
 import { Input } from "../common/input";
@@ -221,7 +222,14 @@ export function FeedingTab({
           <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg text-sm">
             Aucun aliment trouvé dans le stock. 
             <button 
-              onClick={() => window.location.href = `/stock?action=add&category=feed`}
+              onClick={() => {
+                const params = new URLSearchParams({
+                  category: "feed",
+                  name: selectedStockItem?.name || getFeedTypeName(feedType),
+                  farmId: farmId || "",
+                });
+                window.location.href = `/stock/restock?${params.toString()}`;
+              }}
               className="ml-2 underline font-medium"
             >
               Ajouter un aliment
@@ -364,7 +372,13 @@ export function FeedingTab({
                 className="flex-1 bg-blue-600 hover:bg-blue-700"
                 onClick={() => {
                   setShowRestockDialog(false);
-                  window.location.href = `/stock?action=add&category=feed&name=${encodeURIComponent(selectedStockItem?.name || getFeedTypeName(feedType))}`;
+                  const params = new URLSearchParams({
+                    category: "feed",
+                    name: encodeURIComponent(selectedStockItem?.name || getFeedTypeName(feedType)),
+                    farmId: farmId || "",
+                    stockItemId: selectedStockItem?.id || ""
+                  });
+                  window.location.href = `/stock/restock?${params.toString()}`;
                 }}
               >
                 Réapprovisionner

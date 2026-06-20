@@ -41,6 +41,16 @@ export function TreatmentForm({
   const [showRestockDialog, setShowRestockDialog] = useState(false);
   const [stockError, setStockError] = useState<string | null>(null);
 
+  // Stocker les données pour le réapprovisionnement
+  const [pendingRestock, setPendingRestock] = useState<{
+    farmId: string;
+    medication: string;
+    stockItemId: string;
+    message: string;
+    currentStock: number;
+    unit: string;
+  } | null>(null);
+
   const [formData, setFormData] = useState({
     flockId: "",
     diseaseId: "",
@@ -117,6 +127,7 @@ export function TreatmentForm({
       setError(null);
       setStockError(null);
       setShowRestockDialog(false);
+      setPendingRestock(null);
       clearResult();
     }
   }, [open]);
@@ -151,10 +162,21 @@ export function TreatmentForm({
     // Vérification du stock AVANT de continuer
     if (farmId) {
       setStockError(null);
-      const stockCheck = await checkStock("medication", formData.medication, 1, farmId);
+      const stockCheckResult = await checkStock("medication", formData.medication, 1, farmId);
       
-      if (!stockCheck.available) {
-        setStockError(stockCheck.message);
+      if (!stockCheckResult.available) {
+        setStockError(stockCheckResult.message);
+        
+        // Stocker les données pour le réapprovisionnement
+        setPendingRestock({
+          farmId: farmId,
+          medication: formData.medication,
+          stockItemId: stockCheckResult.stock_item?.id || "",
+          message: stockCheckResult.message,
+          currentStock: stockCheckResult.current_stock,
+          unit: stockCheckResult.unit
+        });
+        
         setShowRestockDialog(true);
         return; // SORTIE IMMÉDIATE
       }
@@ -359,15 +381,15 @@ export function TreatmentForm({
         </form>
 
         {/* Dialog de réapprovisionnement */}
-        {showRestockDialog && stockResult && !stockResult.available && (
+        {showRestockDialog && pendingRestock && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-60 p-4">
             <div className="bg-white rounded-xl max-w-md w-full p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Stock insuffisant</h3>
-              <p className="text-gray-600 mb-4">{stockResult.message}</p>
+              <p className="text-gray-600 mb-4">{pendingRestock.message}</p>
               
-              {stockResult.current_stock > 0 && (
+              {pendingRestock.currentStock > 0 && (
                 <p className="text-sm text-gray-500 mb-4">
-                  Stock actuel: {stockResult.current_stock} {stockResult.unit}
+                  Stock actuel: {pendingRestock.currentStock} {pendingRestock.unit}
                 </p>
               )}
               
@@ -378,6 +400,7 @@ export function TreatmentForm({
                   className="flex-1" 
                   onClick={() => {
                     setShowRestockDialog(false);
+                    setPendingRestock(null);
                     setStockError(null);
                     clearResult();
                   }}
@@ -389,7 +412,13 @@ export function TreatmentForm({
                   className="flex-1 bg-blue-600 hover:bg-blue-700"
                   onClick={() => {
                     setShowRestockDialog(false);
-                    window.location.href = `/stock?action=add&category=medication&name=${encodeURIComponent(formData.medication)}`;
+                    const params = new URLSearchParams({
+                      category: "medication",
+                      name: encodeURIComponent(pendingRestock.medication),
+                      farmId: pendingRestock.farmId,
+                      stockItemId: pendingRestock.stockItemId
+                    });
+                    window.location.href = `/stock/restock?${params.toString()}`;
                   }}
                 >
                   Réapprovisionner

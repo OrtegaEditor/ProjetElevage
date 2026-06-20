@@ -27,7 +27,7 @@ import { SalesDashboard } from "./pages/Dashboard/SaleDashboard";
 import { SupplierManagementPage } from "./pages/SupplierManagementPage";
 import { DiseasesPage } from "./pages/DiseasesPage";
 import { ArrivalWizardPage } from "./pages/ArrivalWizardPage";
-
+import { StockRestockPage } from "./pages/StockRestockPage";
 
 
 
@@ -85,6 +85,8 @@ function AppRoutes() {
       <Route path="/health-registry" element={<ProtectedRoute><HealthRegisterPage /></ProtectedRoute>} />
       <Route path="/diseases" element={<ProtectedRoute><DiseasesPage /></ProtectedRoute>} />
       <Route path="/arrival/new" element={<ProtectedRoute><ArrivalWizardPage /></ProtectedRoute>} />
+      <Route path="/stock/restock" element={<StockRestockPage />} />
+
       {/* <Route path="/sales" element={<ProtectedRoute><SalesPage /></ProtectedRoute>} /> */}
 
 

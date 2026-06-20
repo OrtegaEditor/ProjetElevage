@@ -1,3 +1,4 @@
+# backend/app/api/v1/diseases.py
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from uuid import UUID
@@ -26,7 +27,7 @@ def get_diseases(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Récupérer la liste des maladies"""
+    """Récupérer la liste des maladies - accessible à tous"""
     query = db.query(Disease)
     
     if search:
@@ -50,6 +51,7 @@ def get_disease(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    """Récupérer une maladie par son ID - accessible à tous"""
     disease = db.query(Disease).filter(Disease.id == disease_id).first()
     if not disease:
         raise HTTPException(status_code=404, detail="Maladie non trouvée")
@@ -63,8 +65,9 @@ def create_disease(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    """Créer une nouvelle maladie - admin et vétérinaire uniquement"""
     if current_user.role not in ["admin", "veterinarian"]:
-        raise HTTPException(status_code=403, detail="Permission refusée")
+        raise HTTPException(status_code=403, detail="Permission refusée. Seuls admin et vétérinaire peuvent créer")
     
     existing = db.query(Disease).filter(Disease.name == data.name).first()
     if existing:
@@ -85,8 +88,9 @@ def update_disease(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    """Mettre à jour une maladie - admin et vétérinaire uniquement"""
     if current_user.role not in ["admin", "veterinarian"]:
-        raise HTTPException(status_code=403, detail="Permission refusée")
+        raise HTTPException(status_code=403, detail="Permission refusée. Seuls admin et vétérinaire peuvent modifier")
     
     disease = db.query(Disease).filter(Disease.id == disease_id).first()
     if not disease:
@@ -108,6 +112,7 @@ def delete_disease(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    """Supprimer une maladie - admin uniquement"""
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Seuls les administrateurs peuvent supprimer")
     

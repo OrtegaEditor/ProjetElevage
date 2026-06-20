@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { farmsAPI, poultryHousesAPI, flocksAPI, stockAPI, treatmentsAPI, vaccinationsAPI, bandsAPI } from "../../services/api";
+import { farmsAPI, poultryHousesAPI, flocksAPI, stockAPI, treatmentsAPI, vaccinationsAPI, bandsAPI, usersAPI } from "../../services/api";
 import { StatsCards } from "@/components/specific/StatsCards";
 import { QuickActions } from "@/components/specific/QuickActions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/common/card";
@@ -66,7 +66,7 @@ export function AdminDashboard() {
       setLoading(true);
       
       const [farmsData, rawHousesData, flocksData, stockData, treatmentsData, vaccinationsData, bandsData] = await Promise.all([
-        farmsAPI.getAll(),
+        usersAPI.getMyAccessibleFarms(),
         poultryHousesAPI.getAll(),
         flocksAPI.getAll(),
         stockAPI.getAll(),
