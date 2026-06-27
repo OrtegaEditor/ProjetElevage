@@ -10,6 +10,8 @@ flock?: () => void;
 sensor?: () => void;
 house?: () => void;
 user?: () => void;
+feeding?: () => void;
+eggCollecting?: () => void
 };
 onExport?: () => void;
 onRefresh?: () => void;
@@ -19,8 +21,6 @@ isRefreshing?: boolean;
 }
 
 export function DashboardActions({
-onAdd = {},
-onExport,
 onRefresh,
 onNotifications,
 notificationCount = 0,
@@ -28,13 +28,6 @@ isRefreshing = false,
 }: DashboardActionsProps) {
 return (
 <div className="flex flex-wrap items-center gap-2">
-    <AddButton
-    onAddFlock={onAdd.flock}
-    onAddSensor={onAdd.sensor}
-    onAddHouse={onAdd.house}
-    onAddUser={onAdd.user}
-    />
-    <ExportButton onClick={onExport} />
     <RefreshButton onClick={onRefresh} isLoading={isRefreshing} />
     <NotificationButton count={notificationCount} onClick={onNotifications} />
 </div>

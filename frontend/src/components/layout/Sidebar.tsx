@@ -6,6 +6,8 @@
   AlertTriangle, Activity, ShoppingCart, Package,
   ClipboardList, Settings, Pill, Stethoscope,
   UserCog, Syringe, Scale,
+  DivideSquareIcon,
+  Plus,
   } from "lucide-react";
 
   interface MenuItem {
@@ -32,9 +34,9 @@
   {
   label: "Élevage",
   items: [
-    { path: "/poultry-houses", label: "Poulaillers", icon: <Building2 className="w-5 h-5" />, roles: ["admin", "agent"] },
-    { path: "/flocks", label: "Lots de volailles", icon: <Activity className="w-5 h-5" />, roles: ["admin", "agent"] },
-    { path: "/weighing", label: "Pesées", icon: <Scale className="w-5 h-5" />, roles: ["agent"] },
+    { path: "/farms", label: "Fermes", icon: <Building2 className="w-5 h-5" />, roles: ["admin", "agent"] },
+    { path: "/flocks", label: "Lots de volailles", icon: <Activity className="w-5 h-5" />, roles: ["admin", "agent","veterinarian"] },
+    { path: "/weighing", label: "Pesées", icon: <Scale className="w-5 h-5" />, roles: ["agent","admin"] },
     { path: "/stock", label: "Stock", icon: <Package className="w-5 h-5" />, roles: ["admin", "agent"] },
   ],
   },
@@ -51,9 +53,10 @@
   {
   label: "Santé",
   items: [
-    { path: "/treatments", label: "Traitements", icon: <Pill className="w-5 h-5" />, roles: ["veterinarian"] },
-    { path: "/vaccinations", label: "Vaccinations", icon: <Syringe className="w-5 h-5" />, roles: ["veterinarian"] },
-    { path: "/health-registry", label: "Registre sanitaire", icon: <Stethoscope className="w-5 h-5" />, roles: ["veterinarian"] },
+    { path: "/treatments", label: "Traitements", icon: <Pill className="w-5 h-5" />, roles: ["veterinarian","admin","agent"] },
+    { path: "/vaccinations", label: "Vaccinations", icon: <Syringe className="w-5 h-5" />, roles: ["veterinarian","admin","agent"] },
+    { path: "/health-registry", label: "Registre sanitaire", icon: <Stethoscope className="w-5 h-5" />, roles: ["veterinarian","admin","agent"] },
+    { path: "/diseases", label: "Maladies", icon: <Plus className="w-5 h-5" />, roles: ["veterinarian","admin","agent"] },
   ],
   },
 
@@ -61,8 +64,8 @@
   label: "Commercial",
   items: [
     { path: "/sales", label: "Ventes", icon: <ShoppingCart className="w-5 h-5" />, roles: ["commercial", "admin"] },
-    { path: "/clients", label: "Clients", icon: <UserCog className="w-5 h-5" />, roles: ["commercial"] },
-    { path: "/analytics", label: "Analytics", icon: <ClipboardList className="w-5 h-5" />, roles: ["admin"] },
+    { path: "/clients", label: "Clients", icon: <UserCog className="w-5 h-5" />, roles: ["commercial","admin"] },
+    { path: "/analytics", label: "Analytics", icon: <ClipboardList className="w-5 h-5" />, roles: ["admin","commercial"]},
   ],
   },
   ];
@@ -75,11 +78,11 @@
   <aside className="w-64 bg-white border-r border-gray-200 h-screen fixed left-0 top-0 overflow-y-auto">
     <div className="p-6">
       <div className="flex items-center gap-3 mb-8">
-        <div className="w-64 h-10 bg-[#2E7D32] rounded-lg flex items-center justify-center">
-          <Activity className="w-6 h-6 text-white" />
+        <div className="w-10 h-10 bg-[#2E7D32] rounded-lg flex items-center justify-center">
+          <Activity className="w- h-6 text-white" />
         </div>
         <div>
-          <h1 className="font-semibold text-gray-900">PoultryConnect</h1>
+          <h1 className="font-semibold text-gray-900">SYGEXA</h1>
         </div>
       </div>
 
